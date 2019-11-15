@@ -21,6 +21,7 @@ kms_providers = {
 fle_opts = AutoEncryptionOpts(
     kms_providers,
     key_vault_namespace,
+    # uncomment below if you've started mongocryptd in its own process
     # mongocryptd_bypass_spawn=True
 )
 
@@ -32,10 +33,12 @@ client = MongoClient(
 key_vault = client.get_database("encryption").get_collection("__keyVault")
 data_key = key_vault.find_one()
 
-print("DATA KEY", data_key)
-
+"""
+In the guide, we create the data key and then show that it is created by using a
+find_one query. Here, in implementation, we only create the key if it doesn't
+already exist, ensuring we only have one local data key.
+"""
 if data_key is None:
-    print("data key not found, creating")
     with ClientEncryption(
         kms_providers,
         key_vault_namespace,
@@ -44,13 +47,16 @@ if data_key is None:
     ) as client_encryption:
 
         data_key = client_encryption.create_data_key("local")
-        print("created data key", data_key)
         uuid_data_key_id = UUID(bytes=data_key)
 else:
-    print("data key found, skipping creation")
     uuid_data_key_id = data_key["_id"]
 
 
 base_64_data_key_id = base64.b64encode(uuid_data_key_id.bytes).decode("utf-8")
 print("DataKeyId [UUID]: ", uuid_data_key_id)
 print("DataKeyId [base64]: ", base_64_data_key_id)
+
+data_key = key_vault.find_one()
+print("Data Key", data_key)
+
+print("Copy and paste this value into your JSON schema:", base_64_data_key_id)
