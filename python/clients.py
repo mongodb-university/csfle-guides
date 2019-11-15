@@ -2,7 +2,6 @@
 from pymongo import MongoClient
 from pymongo.encryption_options import AutoEncryptionOpts
 from bson.binary import Binary
-from pymongo.errors import EncryptionError
 
 
 """
@@ -10,52 +9,49 @@ This file is meant to be run to demonstrate CSFLE in action. Prior to running
 this file, ensure you've run make-local-data-key.py
 """
 
-patient_schema = {
-    "medicalRecords.patients": {
-        "bsonType": "object",
-        "encryptMetadata": {
-            "keyId": [
-                {
-                    "$binary": {
-                        "base64": "w5pTfe2eRCOaY8nUiBvdLw==",
-                        "subType": "04"
-                    }
-                }
-            ]
-        },
-        "properties": {
-            "insurance": {
-                "bsonType": "object",
-                "properties": {
-                    "policyNumber": {
-                        "encrypt": {
-                            "bsonType": "int",
-                            "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"
+
+def get_patient_schema(key):
+    bin_key = Binary(data=key['_id'].bytes, subtype=4)
+    return {
+        "medicalRecords.patients": {
+            "bsonType": "object",
+            "encryptMetadata": {
+                "keyId": [bin_key]
+            },
+            "properties": {
+                "insurance": {
+                    "bsonType": "object",
+                    "properties": {
+                        "policyNumber": {
+                            "encrypt": {
+                                "bsonType": "int",
+                                "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"
+                            }
                         }
                     }
-                }
-            },
-            "medicalRecords": {
-                "encrypt": {
-                    "bsonType": "array",
-                    "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Random",
-                }
-            },
-            "bloodType": {
-                "encrypt": {
-                    "bsonType": "string",
-                    "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Random"
-                }
-            },
-            "ssn": {
-                "encrypt": {
-                    "bsonType": "int",
-                    "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"
+                },
+                "medicalRecords": {
+                    "encrypt": {
+                        "bsonType": "array",
+                        "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Random",
+                    }
+                },
+                "bloodType": {
+                    "encrypt": {
+                        "bsonType": "string",
+                        "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Random"
+                    }
+                },
+                "ssn": {
+                    "encrypt": {
+                        "bsonType": "int",
+                        "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"
+                    }
                 }
             }
         }
     }
-}
+
 
 connection_string = "mongodb://localhost:27017"
 key_vault_namespace = "encryption.__keyVault"
@@ -69,17 +65,21 @@ kms_providers = {
     },
 }
 
-fle_opts = AutoEncryptionOpts(
-    kms_providers,
-    key_vault_namespace,
-    schema_map=patient_schema,
-    # uncomment below if you've started mongocryptd in its own process
-    mongocryptd_bypass_spawn=True
-)
-
 regular_client = MongoClient(
     connection_string,
 )
+
+key_vault = regular_client.get_database(
+    "encryption").get_collection("__keyVault")
+key = key_vault.find_one()
+fle_opts = AutoEncryptionOpts(
+    kms_providers,
+    key_vault_namespace,
+    schema_map=get_patient_schema(key),
+    # uncomment below if you've started mongocryptd in its own process
+    # mongocryptd_bypass_spawn=True
+)
+
 
 csfle_enabled_client = MongoClient(
     connection_string,
@@ -112,8 +112,8 @@ csfle_client_patients_coll = csfle_enabled_client.get_database(
 # performing the insert operation with the csfle enabled client
 # we're using an update with upsert so that subsequent runs of this script don't
 # add more documents
-# csfle_client_patients_coll.update_one(
-#     {"ssn": example_document["ssn"]}, {"$set": example_document}, upsert=True)
+csfle_client_patients_coll.update_one(
+    {"ssn": example_document["ssn"]}, {"$set": example_document}, upsert=True)
 
 # performing a read using the csfle enabled client. We expect all fields to
 # be readable
@@ -124,7 +124,10 @@ csfle_find_result = csfle_client_patients_coll.find_one(
 
 print(csfle_find_result)
 
+# performing a read using the regular client
+# we can't perform a query on an encrypted field, and the document will be
+# returned to us with encrypted fields unreadable
 regular_find_result = regular_client_patients_coll.find_one(
-    {"ssn": example_document["ssn"]})
+    {"name": "Jon Doe"})
 
 print(regular_find_result)

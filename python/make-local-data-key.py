@@ -55,8 +55,3 @@ else:
 base_64_data_key_id = base64.b64encode(uuid_data_key_id.bytes).decode("utf-8")
 print("DataKeyId [UUID]: ", uuid_data_key_id)
 print("DataKeyId [base64]: ", base_64_data_key_id)
-
-data_key = key_vault.find_one()
-print("Data Key", data_key)
-
-print("Copy and paste this value into your JSON schema:", base_64_data_key_id)
