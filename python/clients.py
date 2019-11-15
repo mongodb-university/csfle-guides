@@ -1,7 +1,8 @@
 
 from pymongo import MongoClient
 from pymongo.encryption_options import AutoEncryptionOpts
-from bson.binary import Binary
+from bson import json_util
+from bson.binary import Binary, UUID
 
 
 """
@@ -9,14 +10,68 @@ This file is meant to be run to demonstrate CSFLE in action. Prior to running
 this file, ensure you've run make-local-data-key.py
 """
 
+patient_schema = """
+{
+    "medicalRecords.patients": {
+        "bsonType": "object",
+        "encryptMetadata": {
+            "keyId": [
+                    {
+                        "$binary": "9bF6oNFqTMqtTdAIYtjTFg==",
+                        "subType": "04"
+                    }
+            ]
+        },
+        "properties": {
+            "insurance": {
+                "bsonType": "object",
+                "properties": {
+                    "policyNumber": {
+                            "encrypt": {
+                                "bsonType": "int",
+                                "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"
+                            }
+                    }
+                }
+            },
+            "medicalRecords": {
+                "encrypt": {
+                    "bsonType": "array",
+                    "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Random",
+                }
+            },
+            "bloodType": {
+                "encrypt": {
+                    "bsonType": "string",
+                    "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Random"
+                }
+            },
+            "ssn": {
+                "encrypt": {
+                    "bsonType": "int",
+                    "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"
+                }
+            }
+        }
+    }
+}
+"""
 
-def get_patient_schema(key):
-    bin_key = Binary(data=key['_id'].bytes, subtype=4)
+
+def get_patient_schema(key=None):
+    # bin_key = Binary(
+    #     data=key.bytes, subtype=4)
+    # print('BIN_KEY', bin_key)
     return {
         "medicalRecords.patients": {
             "bsonType": "object",
             "encryptMetadata": {
-                "keyId": [bin_key]
+                "keyId": [
+                    {
+                        "$binary": "9bF6oNFqTMqtTdAIYtjTFg==",
+                        "subType": "04"
+                    }
+                ]
             },
             "properties": {
                 "insurance": {
@@ -75,7 +130,7 @@ key = key_vault.find_one()
 fle_opts = AutoEncryptionOpts(
     kms_providers,
     key_vault_namespace,
-    schema_map=get_patient_schema(key),
+    schema_map=json_util.loads(patient_schema)
     # uncomment below if you've started mongocryptd in its own process
     # mongocryptd_bypass_spawn=True
 )
