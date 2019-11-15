@@ -1,9 +1,7 @@
-
 from pymongo import MongoClient
 from pymongo.encryption_options import AutoEncryptionOpts
 from bson import json_util
 from bson.binary import Binary, UUID
-
 
 """
 This file is meant to be run to demonstrate CSFLE in action. Prior to running
@@ -17,8 +15,11 @@ patient_schema = """
         "encryptMetadata": {
             "keyId": [
                     {
-                        "$binary": "9bF6oNFqTMqtTdAIYtjTFg==",
-                        "subType": "04"
+                        "$binary":
+                            {
+                                "base64": "PkOoW5UqSIKtMShrnnYWNA==",
+                                "subType": "04"
+                            }
                     }
             ]
         },
@@ -37,7 +38,7 @@ patient_schema = """
             "medicalRecords": {
                 "encrypt": {
                     "bsonType": "array",
-                    "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Random",
+                    "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Random"
                 }
             },
             "bloodType": {
@@ -56,57 +57,6 @@ patient_schema = """
     }
 }
 """
-
-
-def get_patient_schema(key=None):
-    # bin_key = Binary(
-    #     data=key.bytes, subtype=4)
-    # print('BIN_KEY', bin_key)
-    return {
-        "medicalRecords.patients": {
-            "bsonType": "object",
-            "encryptMetadata": {
-                "keyId": [
-                    {
-                        "$binary": "9bF6oNFqTMqtTdAIYtjTFg==",
-                        "subType": "04"
-                    }
-                ]
-            },
-            "properties": {
-                "insurance": {
-                    "bsonType": "object",
-                    "properties": {
-                        "policyNumber": {
-                            "encrypt": {
-                                "bsonType": "int",
-                                "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"
-                            }
-                        }
-                    }
-                },
-                "medicalRecords": {
-                    "encrypt": {
-                        "bsonType": "array",
-                        "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Random",
-                    }
-                },
-                "bloodType": {
-                    "encrypt": {
-                        "bsonType": "string",
-                        "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Random"
-                    }
-                },
-                "ssn": {
-                    "encrypt": {
-                        "bsonType": "int",
-                        "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"
-                    }
-                }
-            }
-        }
-    }
-
 
 connection_string = "mongodb://localhost:27017"
 key_vault_namespace = "encryption.__keyVault"
