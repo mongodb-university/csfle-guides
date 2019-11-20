@@ -19,8 +19,8 @@ def main():
     client_prototype = ClientBuilder(kms_providers=kms_providers)
 
     # make sure you paste in your base64 key that was generated from
-    # make-local-data-key.py
-    data_key = "jXjXI3pAR+Cbd7rJufnQKA=="  # replace with your base64 data key!
+    # make_data_key.py
+    data_key = None  # replace with your base64 data key!
 
     schema = create_json_schema(data_key=data_key)
     csfle_enabled_client = client_prototype.get_csfle_enabled_client(schema)

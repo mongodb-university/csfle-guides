@@ -78,6 +78,11 @@ class ClientBuilder:
                  connection_string="mongodb://localhost:27017",
                  mongocryptd_bypass_spawn=False,
                  mongocryptd_spawn_path="mongocryptd"):
+        """
+        This is a helper class that aids in csfle implementation. If mongocryptd
+        is not installed to in your search path, ensure you override
+        mongocryptd_spawn_path when you instantiate ClientBuilder
+        """
 
         super().__init__()
         if kms_providers is None:
@@ -86,27 +91,26 @@ class ClientBuilder:
         self.key_alt_name = key_alt_name
         self.key_db = key_db
         self.key_coll = key_coll
-        self.key_vault_namespace = f"{key_db}.{key_coll}"
+        self.key_vault_namespace = f"{self.key_db}.{self.key_coll}"
         self.schema = schema
         self.connection_string = connection_string
         self.mongocryptd_bypass_spawn = mongocryptd_bypass_spawn
         self.mongocryptd_spawn_path = mongocryptd_spawn_path
 
-        fle_opts = AutoEncryptionOpts(
-            self.kms_providers,
-            self.key_vault_namespace,
-            mongocryptd_bypass_spawn=self.mongocryptd_bypass_spawn,
-            mongocryptd_spawn_path=self.mongocryptd_spawn_path)
-
-        self.encrypted_client = MongoClient(
-            self.connection_string, auto_encryption_opts=fle_opts)
+        self.key_vault_client = MongoClient(
+            self.connection_string, auto_encryption_opts=AutoEncryptionOpts(
+                self.kms_providers,
+                self.key_vault_namespace,
+                mongocryptd_bypass_spawn=self.mongocryptd_bypass_spawn,
+                mongocryptd_spawn_path=self.mongocryptd_spawn_path))
 
         self.regular_client = MongoClient(self.connection_string)
 
-        self.key_vault = self.encrypted_client.get_database(
-            self.key_db).get_collection(self.key_coll)
+        self.key_vault = (self.key_vault_client
+                          .get_database(self.key_db)
+                          .get_collection(self.key_coll))
 
-        # clients are required to create a unique sparse index on keyAltNames
+        # clients are required to create a unique partial index on keyAltNames
         self.key_vault.create_index("keyAltNames",
                                     unique=True,
                                     partialFilterExpression={
@@ -117,7 +121,8 @@ class ClientBuilder:
 
     def find_or_create_data_key(self):
         """
-        In the guide, we create the data key and then show that it is created by
+        In the guide, https://docs.mongodb.com/ecosystem/use-cases/client-side-field-level-encryption-guide/,
+        we create the data key and then show that it is created by
         using a find_one query. Here, in implementation, we only create the key if
         it doesn't already exist, ensuring we only have one local data key.
 
@@ -126,29 +131,27 @@ class ClientBuilder:
         """
 
         data_key = self.key_vault.find_one(
-            {"keyAltNames": {"$in": ["demo-data-key"]}})
+            {"keyAltNames": {"$in": [self.key_alt_name]}})
 
         if data_key is None:
             with ClientEncryption(self.kms_providers,
                                   self.key_vault_namespace,
-                                  self.encrypted_client,
+                                  self.key_vault_client,
                                   CodecOptions(uuid_representation=STANDARD)
                                   ) as client_encryption:
 
                 data_key = client_encryption.create_data_key(
-                    "local", key_alt_names=["demo-data-key"])
+                    "local", key_alt_names=self.key_alt_name)
                 uuid_data_key_id = UUID(bytes=data_key)
 
         else:
             uuid_data_key_id = data_key["_id"]
 
-        base_64_data_key_id = base64.b64encode(
-            uuid_data_key_id.bytes).decode("utf-8")
+        base_64_data_key_id = (base64
+                               .b64encode(uuid_data_key_id.bytes)
+                               .decode("utf-8"))
 
-        print("Base64 data key Id, paste this into clients.py: ",
-              base_64_data_key_id)
-
-        return uuid_data_key_id
+        return base_64_data_key_id
 
     def get_regular_client(self):
         return self.regular_client
@@ -162,11 +165,6 @@ class ClientBuilder:
             mongocryptd_bypass_spawn=self.mongocryptd_bypass_spawn,
             mongocryptd_spawn_path=self.mongocryptd_spawn_path,
             schema_map=schema)
-        self.encrypted_client.close()
-        self.encrypted_client = MongoClient(
+        self.csfle_enabled_client = MongoClient(
             self.connection_string, auto_encryption_opts=fle_opts)
-        return self.encrypted_client
-
-    def __del__(self):
-        self.regular_client.close()
-        self.encrypted_client.close()
+        return self.csfle_enabled_client

@@ -1,3 +1,4 @@
 data/
 mongocryptd.pid
 *.pyc
+node_modules/

@@ -12,12 +12,12 @@
    pip install -r requirements.txt
    ```
 
-3. Run the `make-local-data-key.py` script to make a data key. If there is an
+3. Run the `make_data_key.py` script to make a data key. If there is an
    existing data key in the **encryption.__keyVault** collection this script
    will not create a duplicate data key.
 
    ```python
-   python make-local-data-key.py
+   python make_data_key.py
    ```
 
 4. Run the `client.py` script to insert a document with the CSFLE-enabled client
