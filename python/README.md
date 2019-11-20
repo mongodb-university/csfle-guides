@@ -20,4 +20,15 @@
    python make-local-data-key.py
    ```
 
-4.
+4. Run the `client.py` script to insert a document with the CSFLE-enabled client
+   and then read that document with both a regular and CSFLE-enabled client. You
+   will see that the CSFLE-enabled client prints the document out in plaintext,
+   and the regular client prints the document out with encrypted fields in
+   binary format. This is safe to run multiple times as the insert operation
+   used is an update with upsert specified.
+
+   ```python
+   python clients.py
+   ```
+
+5. Suggestion: Try inserting a document with the regular client. What happens?
