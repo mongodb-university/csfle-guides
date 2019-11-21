@@ -1,42 +1,31 @@
-Intro
----
+# Node CSFLE Example
 
-This is a guide for ...
-https://docs.mongodb.com/ecosystem/use-cases/client-side-field-level-encryption-guide/
+## Steps
 
-Requirements
----
+1. Start a locally running `mongod` version >= 4.2 running on port 27017
+2. Install dependencies with npm
 
-Similar to CSFLE guide requirements w/additional dependencies
+   ```js
+   npm install
+   ```
 
-MongoDB Server 4.2 Enterprise
--mongocryptd
-something similar to:
-The 4.2-compatible drivers use the Enterprise-only mongocryptd process to parse the JSON schema and apply the encryption rules when reading or writing documents. Automatic encryption requires the mongocryptd process.
+3. Run the `make-data-key.js` script to make a data key. If there is an
+   existing data key in the **encryption.\_\_keyVault** collection this script
+   will not create a duplicate data key.
 
-MongoDB Driver Compatible with CSFLE (NodeJS)
+   ```js
+   node make-data-key.js
+   ```
 
-(Additional) Dependencies
+4. Run the `client.js` script to insert a document with the CSFLE-enabled client
+   and then read that document with both a regular and CSFLE-enabled client. You
+   will see that the CSFLE-enabled client prints the document out in plaintext,
+   and the regular client prints the document out with encrypted fields in
+   binary format. This is safe to run multiple times as the insert operation
+   used is an update with upsert specified.
 
-Setup
----
-install deps
+   ```js
+   node clients.js
+   ```
 
-
--Identify different runnable script/files
-master-key.txt
-
-Run this Example
----
-
-- start up 
-  - mongocryptd
-  - mongod --dbPath or config file
-- generate the key
-- user should insert value of key id into the script that creates the
-  client with JSON schema
-- run encrypted client to execute insert of sample data (needs to be
-  created)
-- run both clients to demonstrate retrieved data format
-
-
+5. Suggestion: Try inserting a document with the regular client. What happens?
