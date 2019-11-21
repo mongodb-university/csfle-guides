@@ -5,8 +5,8 @@
 1. Start a `mongod` instance (version >= 4.2) running on port 27017
 2. Set up your build environment for the Java project. The following build
    files are located in the project root:
-   - pom.xml for [Maven](https://maven.apache.org/)
-   - build.gradle for [Gradle](https://gradle.org/)
+   - `pom.xml` for [Maven](https://maven.apache.org/)
+   - `build.gradle` for [Gradle](https://gradle.org/)
 
 3. Make sure you have the `master-key.txt` file in the root of your
    execution environment. This is a 96-byte cryptographically-secure generated
