@@ -1,1 +1,4 @@
 data/
+java/bin/
+java/target/
+**/mongocryptd.pid
