@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
 }
 
-group = 'com.mongodb.education'
+group = 'com.mongodb.csfle'
 
 version = '0.1-SNAPSHOT'
 
