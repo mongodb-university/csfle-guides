@@ -26,6 +26,26 @@ import com.mongodb.client.model.vault.DataKeyOptions;
 import com.mongodb.client.vault.ClientEncryption;
 import com.mongodb.client.vault.ClientEncryptions;
 
+/*
+ * Copyright 2008-present MongoDB, Inc.
+
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+/*
+ * Helper methods and sample data for this companion project.
+ */
 public class CSFLEHelpers {
 	
 	// Sample data
@@ -90,12 +110,12 @@ public class CSFLEHelpers {
 										new Document().append("policyNumber", buildEncryptedField(keyId, "int", true)))));
 	}
 	
-	// Create Normal Client
+	// Creates Normal Client
 	public static MongoClient createMongoClient(String connectionString) {
 		return MongoClients.create(connectionString);
 	}
 	
-	// Create KeyVault which allows you to create a key as well as encrypt and decrypt fields
+	// Creates KeyVault which allows you to create a key as well as encrypt and decrypt fields
 	public static ClientEncryption createKeyVault(String connectionString, String kmsProvider, byte[] localMasterKey, String keyVaultCollection) {
 		Map<String, Object> masterKeyMap = new HashMap<String, Object>();
 		masterKeyMap.put("key", localMasterKey);
@@ -113,7 +133,7 @@ public class CSFLEHelpers {
 		return ClientEncryptions.create(clientEncryptionSettings);
 	}
 	
-	// Create Encrypted Client which performs automatic encryption and decryption of fields
+	// Creates Encrypted Client which performs automatic encryption and decryption of fields
 	public static MongoClient createEncryptedClient(String connectionString, String kmsProvider, byte[] masterKey, String keyVaultCollection, Document schema, String dataDb, String dataColl) {
 		String recordsNamespace = dataDb + "." + dataColl;
 		
@@ -128,6 +148,7 @@ public class CSFLEHelpers {
 
 		Map<String, Object> extraOpts = new HashMap<String, Object>();
 		extraOpts.put("mongocryptdSpawnPath", "/usr/local/bin/mongocryptd");
+		// uncomment the following line if you are running mongocryptd manually
 //		extraOpts.put("mongocryptdBypassSpawn", true);
 		
 		AutoEncryptionSettings autoEncryptionSettings = AutoEncryptionSettings.builder()
@@ -145,7 +166,7 @@ public class CSFLEHelpers {
 		return MongoClients.create(clientSettings);
 	}
 
-	// Find Existing Data Encryption Key
+	// Returns existing data encryption key
 	public static String findDataEncryptionKey(String connectionString, String keyAltName, String keyDb, String keyColl) {
 		MongoClient mongoClient = createMongoClient(connectionString);
 		
@@ -162,7 +183,7 @@ public class CSFLEHelpers {
 		return null;
 	}
 	
-	// Create index for keyAltNames
+	// Creates index for keyAltNames in the specified key collection
 	public static void createKeyVaultIndex(String connectionString, String keyDb, String keyColl) {
 		MongoClient mongoClient = createMongoClient(connectionString);
 		
@@ -174,7 +195,8 @@ public class CSFLEHelpers {
 		collection.createIndex(new Document("keyAltNames", 1), indexOptions);
 	}
 	
-	// Create Data Encryption Key; should only be called after checking whether a data encryption key with same keyAltName exists
+	// Create data encryption key in the specified key collection
+	// Call only after checking whether a data encryption key with same keyAltName exists
 	public static String createDataEncryptionKey(String connectionString, String kmsProvider, byte[] localMasterKey, String keyVaultCollection, String keyAltName) {
 		ClientEncryption keyVault = createKeyVault(connectionString, kmsProvider, localMasterKey, keyVaultCollection);
 
