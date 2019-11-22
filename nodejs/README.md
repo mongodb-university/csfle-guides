@@ -17,7 +17,10 @@
    node make-data-key.js
    ```
 
-4. Run the `client.js` script to insert a document with the CSFLE-enabled client
+   You will use the output of this script to seed the base64 key id used in
+   `clients.js`
+
+4. Run the `clients.js` script to insert a document with the CSFLE-enabled client
    and then read that document with both a regular and CSFLE-enabled client. You
    will see that the CSFLE-enabled client prints the document out in plaintext,
    and the regular client prints the document out with encrypted fields in

@@ -1,18 +1,18 @@
-const { readMasterKey, ClientBuilder } = require("./helpers")
+const { readMasterKey, CsfleHelper } = require("./helpers")
 
 const localMasterKey = readMasterKey()
 
-const clientBuilder = new ClientBuilder({
+const csfleHelper = new CsfleHelper({
   kmsProviders: {
     local: {
-      key: localMasterKey
-    }
-  }
+      key: localMasterKey,
+    },
+  },
 })
 
-clientBuilder.findOrCreateDataKey().then(key => {
+csfleHelper.findOrCreateDataKey().then(key => {
   console.log(
     "Base64 data key. Copy and paste this into clients.js\t",
-    key["_id"].toString("base64")
+    key["_id"].toString("base64"),
   )
 })
