@@ -32,15 +32,15 @@ def main():
         },
     }
 
-    client_builder = CsfleHelper(kms_providers=kms_providers)
+    csfle_helper = CsfleHelper(kms_providers=kms_providers)
 
     # make sure you paste in your base64 key that was generated from
     # make_data_key.py
     data_key = None  # replace with your base64 data key!
 
-    schema = client_builder.create_json_schema(data_key=data_key)
-    csfle_enabled_client = client_builder.get_csfle_enabled_client(schema)
-    regular_client = client_builder.get_regular_client()
+    schema = csfle_helper.create_json_schema(data_key=data_key)
+    csfle_enabled_client = csfle_helper.get_csfle_enabled_client(schema)
+    regular_client = csfle_helper.get_regular_client()
 
     example_document = {
         "name": "Jon Doe",
@@ -58,11 +58,8 @@ def main():
         }
     }
 
-    regular_client_patients_coll = regular_client.get_database(
-        "medicalRecords").get_collection("patients")
-
-    csfle_client_patients_coll = csfle_enabled_client.get_database(
-        "medicalRecords").get_collection("patients")
+    regular_client_patients_coll = regular_client["medicalRecords"]["patients"]
+    csfle_client_patients_coll = csfle_enabled_client["medicalRecords"]["patients"]
 
     # performing the insert operation with the csfle enabled client
     # we're using an update with upsert so that subsequent runs of this script don't

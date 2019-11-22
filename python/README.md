@@ -25,7 +25,7 @@
    python make_data_key.py
    ```
 
-5. Run the `client.py` script to insert a document with the CSFLE-enabled client
+5. Run the `app.py` script to insert a document with the CSFLE-enabled client
    and then read that document with both a regular and CSFLE-enabled client. You
    will see that the CSFLE-enabled client prints the document out in plaintext,
    and the regular client prints the document out with encrypted fields in
@@ -33,7 +33,7 @@
    used is an update with upsert specified.
 
    ```python
-   python clients.py
+   python app.py
    ```
 
 6. Suggestion: Try inserting a document with the regular client. What happens?

@@ -40,6 +40,7 @@ class CsfleHelper:
                  key_coll="__keyVault",
                  schema=None,
                  connection_string="mongodb://localhost:27017",
+                 # setting this to True requires manually running mongocryptd
                  mongocryptd_bypass_spawn=False,
                  mongocryptd_spawn_path="mongocryptd"):
         """If mongocryptd
@@ -81,16 +82,9 @@ class CsfleHelper:
         finding the key in the clients.py script.
         """
 
-        key_vault_client = MongoClient(
-            self.connection_string, auto_encryption_opts=AutoEncryptionOpts(
-                self.kms_providers,
-                self.key_vault_namespace,
-                mongocryptd_bypass_spawn=self.mongocryptd_bypass_spawn,
-                mongocryptd_spawn_path=self.mongocryptd_spawn_path))
+        key_vault_client = MongoClient(self.connection_string)
 
-        key_vault = (key_vault_client
-                     .get_database(self.key_db)
-                     .get_collection(self.key_coll))
+        key_vault = key_vault_client[self.key_db][self.key_coll]
 
         self.ensure_unique_index_on_key_vault(key_vault)
 
@@ -121,10 +115,7 @@ class CsfleHelper:
     def get_regular_client(self):
         return MongoClient(self.connection_string)
 
-    def get_csfle_enabled_client(self, schema=None):
-        if schema is None:
-            raise ValueError("schema is required")
-
+    def get_csfle_enabled_client(self, schema):
         return MongoClient(
             self.connection_string,
             auto_encryption_opts=AutoEncryptionOpts(
@@ -135,11 +126,8 @@ class CsfleHelper:
                 schema_map=schema)
         )
 
-    def create_json_schema(self, data_key=None):
-        if data_key is None:
-            raise ValueError("data_key must be provided")
-
-        patient_schema = {
+    def create_json_schema(self, data_key):
+        return {
             "medicalRecords.patients": {
                 "bsonType": "object",
                 "encryptMetadata": {
@@ -178,4 +166,3 @@ class CsfleHelper:
                 }
             }
         }
-        return patient_schema
