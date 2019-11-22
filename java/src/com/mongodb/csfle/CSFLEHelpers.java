@@ -1,7 +1,23 @@
+/*
+ * Copyright 2008-present MongoDB, Inc.
+
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.mongodb.csfle;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -21,27 +37,11 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.vault.DataKeyOptions;
 import com.mongodb.client.vault.ClientEncryption;
 import com.mongodb.client.vault.ClientEncryptions;
-
-/*
- * Copyright 2008-present MongoDB, Inc.
-
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
 
 /*
  * Helper methods and sample data for this companion project.
@@ -64,21 +64,13 @@ public class CSFLEHelpers {
                 .append("provider", "MaestCare"));
 
     // Reads the 96-byte local master key
-    public static byte[] readMasterKey(String filePath) throws IOException {
-        FileInputStream fis = null;
+    public static byte[] readMasterKey(String filePath) throws Exception {
         int numBytes = 96;
         byte[] fileBytes = new byte[numBytes];
 
-        try {
-            fis = new FileInputStream(filePath);
+        try (FileInputStream fis = new FileInputStream(filePath)) {
             if (fis.read(fileBytes) < numBytes)
                 throw new Exception("Expected to read 96 bytes from file");
-        } catch(Exception e) {
-            e.printStackTrace();
-            System.exit(1);;
-        } finally {
-            if (fis != null)
-                fis.close();
         }
         return fileBytes;
     }
@@ -180,31 +172,31 @@ public class CSFLEHelpers {
 
     // Returns existing data encryption key
     public static String findDataEncryptionKey(String connectionString, String keyAltName, String keyDb, String keyColl) {
-        MongoClient mongoClient = createMongoClient(connectionString);
+        try (MongoClient mongoClient = createMongoClient(connectionString)) {
+            Document query = new Document("keyAltNames", keyAltName);
+            MongoCollection<Document> collection = mongoClient.getDatabase(keyDb).getCollection(keyColl);
+            BsonDocument doc = collection
+                    .withDocumentClass(BsonDocument.class)
+                    .find(query)
+                    .first();
 
-        Document query = new Document("keyAltNames", keyAltName);
-        MongoCollection<Document> collection = mongoClient.getDatabase(keyDb).getCollection(keyColl);
-        BsonDocument doc = collection
-                .withDocumentClass(BsonDocument.class)
-                .find(query)
-                .first();
-
-        if (doc != null) {
-            return Base64.getEncoder().encodeToString(doc.getBinary("_id").getData());
+            if (doc != null) {
+                return Base64.getEncoder().encodeToString(doc.getBinary("_id").getData());
+            }
+            return null;
         }
-        return null;
     }
 
     // Creates index for keyAltNames in the specified key collection
     public static void createKeyVaultIndex(String connectionString, String keyDb, String keyColl) {
-        MongoClient mongoClient = createMongoClient(connectionString);
+        try (MongoClient mongoClient = createMongoClient(connectionString)) {
+            MongoCollection<Document> collection = mongoClient.getDatabase(keyDb).getCollection(keyColl);
 
-        MongoCollection<Document> collection = mongoClient.getDatabase(keyDb).getCollection(keyColl);
+            Bson filterExpr = Filters.exists("keyAltNames", true);
+            IndexOptions indexOptions = new IndexOptions().unique(true).partialFilterExpression(filterExpr);
 
-        Document filterExpr = new Document("keyAltNames", new Document("$exists", true));
-        IndexOptions indexOptions = new IndexOptions().unique(true).partialFilterExpression((Bson) filterExpr);
-
-        collection.createIndex(new Document("keyAltNames", 1), indexOptions);
+            collection.createIndex(new Document("keyAltNames", 1), indexOptions);
+        }
     }
 
     // Create data encryption key in the specified key collection

@@ -1,7 +1,3 @@
-package com.mongodb.csfle;
-
-import java.io.IOException;
-
 /*
  * Copyright 2008-present MongoDB, Inc.
 
@@ -19,13 +15,15 @@ import java.io.IOException;
  *
  */
 
+package com.mongodb.csfle;
+
 /*
  * - Reads master key from file "master-key.txt" in root directory of project
  * - Locates existing local encryption key from encryption.__keyVault collection
  */
 public class DataEncryptionKeyCreator {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         String connectionString = "mongodb://localhost:27017";
         String keyDb = "encryption";
         String keyColl = "__keyVault";
