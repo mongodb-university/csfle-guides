@@ -3,8 +3,8 @@
 ## Steps
 
 1. Start a `mongod` instance (version >= 4.2) running on port 27017
-2. Set up your build environment for the Java project. The following build
-   files are located in the project root:
+2. Set up your build environment for the Java (>= 1.8) project. The following 
+   build files are located in the project root:
    - `pom.xml` for [Maven](https://maven.apache.org/)
    - `build.gradle` for [Gradle](https://gradle.org/)
 
@@ -14,14 +14,17 @@
    own master key or use a KMS, refer to the [CSFLE Use Case
    Guide](https://docs.mongodb.com/ecosystem/use-cases/client-side-field-level-encryption-guide/).
 
-3. Run the `main` method in `DataEncryptionKeyCreator.java` to insert
+4. Make sure the `mongocryptd` path is correct in the `CSFLEHelpers.java`
+   class.
+   
+5. Run the `main` method in `DataEncryptionKeyCreator.java` to insert
    a new data key in the **encryption.__keyVault** collection. Copy the key id
    that is printed on the console.
 
-4. Update the `keyId` variable in `InsertDataWithEncryptedFields.java`
+6. Update the `keyId` variable in `InsertDataWithEncryptedFields.java`
    with the value from the previous step.
 
-5. Run the `main` method in `InsertDataWithEncryptedFields.java`. This
+7. Run the `main` method in `InsertDataWithEncryptedFields.java`. This
    executes the following:
 
    - Inserts (using upsert) a sample document with encrypted fields
@@ -33,4 +36,4 @@
      field. The retrieved document contains encrypted fields that are not
      human-readable.
 
-6. Update the code to insert a document with the regular client. What happens?
+8. Update the code to insert a document with the regular client. What happens?
