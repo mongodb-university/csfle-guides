@@ -1,8 +1,24 @@
-from helpers import read_master_key, ClientBuilder, create_json_schema
+#
+# Copyright 2019-present MongoDB, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+from helpers import read_master_key, CsfleHelper
 
 """
 This file is meant to be run to demonstrate CSFLE in action. Prior to running
-this file, ensure you've run make-local-data-key.py
+this file, ensure you've run make_data_key.py
 """
 
 
@@ -16,15 +32,15 @@ def main():
         },
     }
 
-    client_prototype = ClientBuilder(kms_providers=kms_providers)
+    client_builder = CsfleHelper(kms_providers=kms_providers)
 
     # make sure you paste in your base64 key that was generated from
     # make_data_key.py
     data_key = None  # replace with your base64 data key!
 
-    schema = create_json_schema(data_key=data_key)
-    csfle_enabled_client = client_prototype.get_csfle_enabled_client(schema)
-    regular_client = client_prototype.get_regular_client()
+    schema = client_builder.create_json_schema(data_key=data_key)
+    csfle_enabled_client = client_builder.get_csfle_enabled_client(schema)
+    regular_client = client_builder.get_regular_client()
 
     example_document = {
         "name": "Jon Doe",

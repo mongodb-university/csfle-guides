@@ -1,3 +1,21 @@
+#
+# Copyright 2019-present MongoDB, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+"""Helpers for CSFLE implementation."""
+
 import base64
 
 from pymongo import MongoClient
@@ -5,71 +23,17 @@ from pymongo.encryption_options import AutoEncryptionOpts
 from pymongo.encryption import ClientEncryption
 from bson.codec_options import CodecOptions
 from bson.binary import Binary, STANDARD, UUID
-from bson import json_util
 
 
 def read_master_key(path="./master-key.txt"):
     return Binary(open(path, "rb").read(96))
 
 
-def create_json_schema(data_key=None):
-    if data_key is None:
-        raise ValueError("data_key must be provided")
+class CsfleHelper:
+    """This is a helper class that aids in csfle implementation."""
 
-    patient_schema = """
-    {{
-        "medicalRecords.patients": {{
-            "bsonType": "object",
-            "encryptMetadata": {{
-                "keyId": [
-                    {{
-                        "$binary": {{
-                            "base64": "{data_key}",
-                            "subType": "04"
-                        }}
-                    }}
-                ]
-            }},
-            "properties": {{
-                "insurance": {{
-                    "bsonType": "object",
-                    "properties": {{
-                        "policyNumber": {{
-                            "encrypt": {{
-                                "bsonType": "int",
-                                "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"
-                            }}
-                        }}
-                    }}
-                }},
-                "medicalRecords": {{
-                    "encrypt": {{
-                        "bsonType": "array",
-                        "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Random"
-                    }}
-                }},
-                "bloodType": {{
-                    "encrypt": {{
-                        "bsonType": "string",
-                        "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Random"
-                    }}
-                }},
-                "ssn": {{
-                    "encrypt": {{
-                        "bsonType": "int",
-                        "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"
-                    }}
-                }}
-            }}
-        }}
-    }}
-    """.format(data_key=data_key)
-
-    return json_util.loads(patient_schema)
-
-
-class ClientBuilder:
     def __init__(self,
+
                  kms_providers=None,
                  key_alt_name="demo-data-key",
                  key_db="encryption",
@@ -78,12 +42,10 @@ class ClientBuilder:
                  connection_string="mongodb://localhost:27017",
                  mongocryptd_bypass_spawn=False,
                  mongocryptd_spawn_path="mongocryptd"):
-        """
-        This is a helper class that aids in csfle implementation. If mongocryptd
+        """If mongocryptd
         is not installed to in your search path, ensure you override
-        mongocryptd_spawn_path when you instantiate ClientBuilder
+        mongocryptd_spawn_path
         """
-
         super().__init__()
         if kms_providers is None:
             raise ValueError("kms_provider is required")
@@ -97,27 +59,16 @@ class ClientBuilder:
         self.mongocryptd_bypass_spawn = mongocryptd_bypass_spawn
         self.mongocryptd_spawn_path = mongocryptd_spawn_path
 
-        self.key_vault_client = MongoClient(
-            self.connection_string, auto_encryption_opts=AutoEncryptionOpts(
-                self.kms_providers,
-                self.key_vault_namespace,
-                mongocryptd_bypass_spawn=self.mongocryptd_bypass_spawn,
-                mongocryptd_spawn_path=self.mongocryptd_spawn_path))
-
-        self.regular_client = MongoClient(self.connection_string)
-
-        self.key_vault = (self.key_vault_client
-                          .get_database(self.key_db)
-                          .get_collection(self.key_coll))
+    def ensure_unique_index_on_key_vault(self, key_vault):
 
         # clients are required to create a unique partial index on keyAltNames
-        self.key_vault.create_index("keyAltNames",
-                                    unique=True,
-                                    partialFilterExpression={
-                                        "keyAltNames": {
-                                            "$exists": True
-                                        }
-                                    })
+        key_vault.create_index("keyAltNames",
+                               unique=True,
+                               partialFilterExpression={
+                                   "keyAltNames": {
+                                       "$exists": True
+                                   }
+                               })
 
     def find_or_create_data_key(self):
         """
@@ -130,18 +81,32 @@ class ClientBuilder:
         finding the key in the clients.py script.
         """
 
-        data_key = self.key_vault.find_one(
-            {"keyAltNames": {"$in": [self.key_alt_name]}})
+        key_vault_client = MongoClient(
+            self.connection_string, auto_encryption_opts=AutoEncryptionOpts(
+                self.kms_providers,
+                self.key_vault_namespace,
+                mongocryptd_bypass_spawn=self.mongocryptd_bypass_spawn,
+                mongocryptd_spawn_path=self.mongocryptd_spawn_path))
+
+        key_vault = (key_vault_client
+                     .get_database(self.key_db)
+                     .get_collection(self.key_coll))
+
+        self.ensure_unique_index_on_key_vault(key_vault)
+
+        data_key = key_vault.find_one(
+            {"keyAltNames": self.key_alt_name}
+        )
 
         if data_key is None:
             with ClientEncryption(self.kms_providers,
                                   self.key_vault_namespace,
-                                  self.key_vault_client,
+                                  key_vault_client,
                                   CodecOptions(uuid_representation=STANDARD)
                                   ) as client_encryption:
 
                 data_key = client_encryption.create_data_key(
-                    "local", key_alt_names=self.key_alt_name)
+                    "local", key_alt_names=[self.key_alt_name])
                 uuid_data_key_id = UUID(bytes=data_key)
 
         else:
@@ -154,17 +119,63 @@ class ClientBuilder:
         return base_64_data_key_id
 
     def get_regular_client(self):
-        return self.regular_client
+        return MongoClient(self.connection_string)
 
     def get_csfle_enabled_client(self, schema=None):
         if schema is None:
             raise ValueError("schema is required")
-        fle_opts = AutoEncryptionOpts(
-            self.kms_providers,
-            self.key_vault_namespace,
-            mongocryptd_bypass_spawn=self.mongocryptd_bypass_spawn,
-            mongocryptd_spawn_path=self.mongocryptd_spawn_path,
-            schema_map=schema)
-        self.csfle_enabled_client = MongoClient(
-            self.connection_string, auto_encryption_opts=fle_opts)
-        return self.csfle_enabled_client
+
+        return MongoClient(
+            self.connection_string,
+            auto_encryption_opts=AutoEncryptionOpts(
+                self.kms_providers,
+                self.key_vault_namespace,
+                mongocryptd_bypass_spawn=self.mongocryptd_bypass_spawn,
+                mongocryptd_spawn_path=self.mongocryptd_spawn_path,
+                schema_map=schema)
+        )
+
+    def create_json_schema(self, data_key=None):
+        if data_key is None:
+            raise ValueError("data_key must be provided")
+
+        patient_schema = {
+            "medicalRecords.patients": {
+                "bsonType": "object",
+                "encryptMetadata": {
+                    "keyId": [Binary(base64.b64decode(data_key), 4)]
+                },
+                "properties": {
+                    "insurance": {
+                        "bsonType": "object",
+                        "properties": {
+                            "policyNumber": {
+                                "encrypt": {
+                                    "bsonType": "int",
+                                    "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"
+                                }
+                            }
+                        }
+                    },
+                    "medicalRecords": {
+                        "encrypt": {
+                            "bsonType": "array",
+                            "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Random"
+                        }
+                    },
+                    "bloodType": {
+                        "encrypt": {
+                            "bsonType": "string",
+                            "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Random"
+                        }
+                    },
+                    "ssn": {
+                        "encrypt": {
+                            "bsonType": "int",
+                            "algorithm": "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"
+                        }
+                    }
+                }
+            }
+        }
+        return patient_schema
