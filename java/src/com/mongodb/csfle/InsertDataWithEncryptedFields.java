@@ -71,7 +71,6 @@ public class InsertDataWithEncryptedFields {
 		Document result = collection.find(ssnQuery).first();
 		System.out.println("Encrypted client query by the SSN (deterministically-encrypted) field:\n" + result.toJson());
 		
-		
 		// Query SSN field with normal client without encryption
 		MongoClient normalMongoClient = MongoClients.create(new ConnectionString(connectionString));
 		MongoCollection<Document> normalCollection = normalMongoClient.getDatabase(recordsDb).getCollection(recordsColl);

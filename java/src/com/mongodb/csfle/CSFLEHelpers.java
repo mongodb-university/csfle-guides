@@ -65,15 +65,24 @@ public class CSFLEHelpers {
 	
 	// Reads the 96-byte local master key
 	public static byte[] readMasterKey(String filePath) throws IOException {
-		String masterKeyPath = filePath;
-		byte[] buf = new byte[96];
+		FileInputStream fis = null;
+		int numBytes = 96;
+		byte[] fileBytes = new byte[numBytes];
 
-		try (FileInputStream fis = new FileInputStream(masterKeyPath)) {
-			fis.readNBytes(buf, 0, 96);
+		try {
+			fis = new FileInputStream(filePath);
+			if (fis.read(fileBytes) < numBytes)
+				throw new Exception("Expected to read 96 bytes from file");
+		} catch(Exception e) {
+			e.printStackTrace();
+			System.exit(1);;
+		} finally {
+			if (fis != null)
+				fis.close();
 		}
-		return buf;
+		return fileBytes;
 	}
-	
+
 	// JSON Schema helpers
 	private static String DETERMINISTIC_ENCRYPTION_TYPE = "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic";
 	private static String RANDOM_ENCRYPTION_TYPE = "AEAD_AES_256_CBC_HMAC_SHA_512-Random";
@@ -133,6 +142,9 @@ public class CSFLEHelpers {
 		return ClientEncryptions.create(clientEncryptionSettings);
 	}
 	
+	// You may need to update the following variable to point to your mongocryptd binary
+	private static String mongocryptdPath = "/usr/local/bin/mongocryptd";
+
 	// Creates Encrypted Client which performs automatic encryption and decryption of fields
 	public static MongoClient createEncryptedClient(String connectionString, String kmsProvider, byte[] masterKey, String keyVaultCollection, Document schema, String dataDb, String dataColl) {
 		String recordsNamespace = dataDb + "." + dataColl;
@@ -147,7 +159,7 @@ public class CSFLEHelpers {
 		kmsProviders.put(kmsProvider, keyMap);
 
 		Map<String, Object> extraOpts = new HashMap<String, Object>();
-		extraOpts.put("mongocryptdSpawnPath", "/usr/local/bin/mongocryptd");
+		extraOpts.put("mongocryptdSpawnPath", mongocryptdPath);
 		// uncomment the following line if you are running mongocryptd manually
 //		extraOpts.put("mongocryptdBypassSpawn", true);
 		
