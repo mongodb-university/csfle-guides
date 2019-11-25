@@ -60,8 +60,8 @@ public class CSFLEHelpers {
                     new Document().append("weight", "180"),
                     new Document().append("bloodPressure", "120/80")))
             .append("insurance", new Document()
-                .append("policyNumber", 123142)
-                .append("provider", "MaestCare"));
+                    .append("policyNumber", 123142)
+                    .append("provider", "MaestCare"));
 
     // Reads the 96-byte local master key
     public static byte[] readMasterKey(String filePath) throws Exception {
@@ -153,7 +153,7 @@ public class CSFLEHelpers {
         Map<String, Object> extraOpts = new HashMap<String, Object>();
         extraOpts.put("mongocryptdSpawnPath", mongocryptdPath);
         // uncomment the following line if you are running mongocryptd manually
-//      extraOpts.put("mongocryptdBypassSpawn", true);
+        //      extraOpts.put("mongocryptdBypassSpawn", true);
 
         AutoEncryptionSettings autoEncryptionSettings = AutoEncryptionSettings.builder()
                 .keyVaultNamespace(keyVaultCollection)
@@ -202,10 +202,10 @@ public class CSFLEHelpers {
     // Create data encryption key in the specified key collection
     // Call only after checking whether a data encryption key with same keyAltName exists
     public static String createDataEncryptionKey(String connectionString, String kmsProvider, byte[] localMasterKey, String keyVaultCollection, String keyAltName) {
-        ClientEncryption keyVault = createKeyVault(connectionString, kmsProvider, localMasterKey, keyVaultCollection);
+        try (ClientEncryption keyVault = createKeyVault(connectionString, kmsProvider, localMasterKey, keyVaultCollection)) {
+            BsonBinary dataKeyId = keyVault.createDataKey(kmsProvider, new DataKeyOptions().keyAltNames(Arrays.asList(keyAltName)));
 
-        BsonBinary dataKeyId = keyVault.createDataKey(kmsProvider, new DataKeyOptions().keyAltNames(Arrays.asList(keyAltName)));
-
-        return Base64.getEncoder().encodeToString(dataKeyId.getData());
+            return Base64.getEncoder().encodeToString(dataKeyId.getData());
+        }
     }
 }
