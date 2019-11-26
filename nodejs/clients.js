@@ -5,12 +5,12 @@ const localMasterKey = readMasterKey()
 const csfleHelper = new CsfleHelper({
   kmsProviders: {
     local: {
-      key: localMasterKey,
-    },
-  },
+      key: localMasterKey
+    }
+  }
 })
-// Wrapping everything in an async iife to allow use of async/await
-;(async () => {
+
+main = async function() {
   // change this to the base64 encoded data key generated from make-data-key.js
   let dataKey = null // change this!
 
@@ -25,13 +25,13 @@ const csfleHelper = new CsfleHelper({
     medicalRecords: [
       {
         weight: 180,
-        bloodPressure: "120/80",
-      },
+        bloodPressure: "120/80"
+      }
     ],
     insurance: {
       provider: "MaestCare",
-      policyNumber: 123142,
-    },
+      policyNumber: 123142
+    }
   }
 
   const regularClientPatientsColl = regularClient
@@ -47,26 +47,28 @@ const csfleHelper = new CsfleHelper({
   await csfleClientPatientsColl.updateOne(
     { ssn: exampleDocument["ssn"] },
     { $set: exampleDocument },
-    { upsert: true },
+    { upsert: true }
   )
 
   // Performs a read using the encrypted client, querying on an encrypted field
   const csfleFindResult = await csfleClientPatientsColl.findOne({
-    ssn: exampleDocument["ssn"],
+    ssn: exampleDocument["ssn"]
   })
   console.log(
     "Document retreived with csfle enabled client:\n",
-    csfleFindResult,
+    csfleFindResult
   )
 
   // Performs a read using the regular client. We must query on a field that is
   // not encrypted.
   // Try - query on the ssn field. What is returned?
   const regularFindResult = await regularClientPatientsColl.findOne({
-    name: "Jon Doe",
+    name: "Jon Doe"
   })
   console.log("Document retreived with regular client:\n", regularFindResult)
 
-  regularClient.close()
-  csfleClient.close()
-})()
+  await regularClient.close()
+  await csfleClient.close()
+}
+
+main().catch(console.dir)

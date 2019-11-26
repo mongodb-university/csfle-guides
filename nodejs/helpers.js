@@ -16,7 +16,7 @@ module.exports = {
       schema = null,
       connectionString = "mongodb://localhost:27017",
       mongocryptdBypassSpawn = false,
-      mongocryptdSpawnPath = "mongocryptd",
+      mongocryptdSpawnPath = "mongocryptd"
     } = {}) {
       if (kmsProviders === null) {
         throw new Error("kmsProviders is required")
@@ -35,6 +35,8 @@ module.exports = {
     }
 
     /**
+     * Creates a unique, partial index in the key vault collection
+     * on the ``keyAltNames`` field.
      *
      * @param {MongoClient} client
      */
@@ -47,9 +49,9 @@ module.exports = {
             unique: true,
             partialFilterExpression: {
               keyAltNames: {
-                $exists: true,
-              },
-            },
+                $exists: true
+              }
+            }
           })
       } catch (e) {
         console.error(e)
@@ -65,14 +67,15 @@ module.exports = {
      * local data key.
      */
     async findOrCreateDataKey() {
-      const client = await new MongoClient(this.connectionString, {
+      const client = new MongoClient(this.connectionString, {
         useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }).connect()
+        useUnifiedTopology: true
+      })
+      await client.connect()
 
       const encryption = new ClientEncryption(client, {
         keyVaultNamespace: this.keyVaultNamespace,
-        kmsProviders: this.kmsProviders,
+        kmsProviders: this.kmsProviders
       })
 
       await this.ensureUniqueIndexOnKeyVault(client)
@@ -84,50 +87,52 @@ module.exports = {
 
       if (dataKey === null) {
         dataKey = await encryption.createDataKey("local", {
-          keyAltNames: [this.keyAltNames],
+          keyAltNames: [this.keyAltNames]
         })
       }
 
-      client.close()
+      await client.close()
       return dataKey
     }
 
     async getRegularClient() {
-      return await new MongoClient(this.connectionString, {
+      const client = new MongoClient(this.connectionString, {
         useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }).connect()
+        useUnifiedTopology: true
+      })
+      return await client.connect()
     }
 
     async getCsfleEnabledClient(schemaMap = null) {
       if (schemaMap === null) {
         throw new Error(
-          "schemaMap is a required argument. Build it using the ClientBuilder.createJsonSchemaMap method",
+          "schemaMap is a required argument. Build it using the CsfleHelper.createJsonSchemaMap method"
         )
       }
-      return await new MongoClient(this.connectionString, {
+      const client = new MongoClient(this.connectionString, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         monitorCommands: true,
         autoEncryption: {
           keyVaultNamespace: this.keyVaultNamespace,
           kmsProviders: this.kmsProviders,
-          schemaMap,
-        },
-      }).connect()
+          schemaMap
+        }
+      })
+      return await client.connect()
     }
 
     createJsonSchemaMap(dataKey = null) {
       if (dataKey === null) {
         throw new Error(
-          "dataKey is a required argument. Ensure you've defined it in clients.js",
+          "dataKey is a required argument. Ensure you've defined it in clients.js"
         )
       }
       return {
         "medicalRecords.patients": {
           bsonType: "object",
           encryptMetadata: {
-            keyId: [new Binary(Buffer.from(dataKey, "base64"), 4)],
+            keyId: [new Binary(Buffer.from(dataKey, "base64"), 4)]
           },
           properties: {
             insurance: {
@@ -136,32 +141,32 @@ module.exports = {
                 policyNumber: {
                   encrypt: {
                     bsonType: "int",
-                    algorithm: "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic",
-                  },
-                },
-              },
+                    algorithm: "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"
+                  }
+                }
+              }
             },
             medicalRecords: {
               encrypt: {
                 bsonType: "array",
-                algorithm: "AEAD_AES_256_CBC_HMAC_SHA_512-Random",
-              },
+                algorithm: "AEAD_AES_256_CBC_HMAC_SHA_512-Random"
+              }
             },
             bloodType: {
               encrypt: {
                 bsonType: "string",
-                algorithm: "AEAD_AES_256_CBC_HMAC_SHA_512-Random",
-              },
+                algorithm: "AEAD_AES_256_CBC_HMAC_SHA_512-Random"
+              }
             },
             ssn: {
               encrypt: {
                 bsonType: "int",
-                algorithm: "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic",
-              },
-            },
-          },
-        },
+                algorithm: "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"
+              }
+            }
+          }
+        }
       }
     }
-  },
+  }
 }
