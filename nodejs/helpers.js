@@ -1,6 +1,6 @@
 const fs = require("fs")
 const mongodb = require("mongodb")
-const { ClientEncryption } = require("mongodb-client-encryption")(mongodb)
+const { ClientEncryption } = require("mongodb-client-encryption")
 const { MongoClient, Binary } = mongodb
 
 module.exports = {
@@ -65,14 +65,10 @@ module.exports = {
      * retreiving it using a findOne query. Here, in implementation, we only
      * create the key if it doesn't already exist, ensuring we only have one
      * local data key.
+     *
+     * @param {MongoClient} client
      */
-    async findOrCreateDataKey() {
-      const client = new MongoClient(this.connectionString, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-      })
-      await client.connect()
-
+    async findOrCreateDataKey(client) {
       const encryption = new ClientEncryption(client, {
         keyVaultNamespace: this.keyVaultNamespace,
         kmsProviders: this.kmsProviders
@@ -91,7 +87,6 @@ module.exports = {
         })
       }
 
-      await client.close()
       return dataKey
     }
 

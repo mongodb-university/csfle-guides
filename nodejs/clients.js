@@ -10,7 +10,7 @@ const csfleHelper = new CsfleHelper({
   }
 })
 
-main = async function() {
+async function main() {
   // change this to the base64 encoded data key generated from make-data-key.js
   let dataKey = null // change this!
 
