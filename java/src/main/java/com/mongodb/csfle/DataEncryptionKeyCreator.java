@@ -17,7 +17,7 @@
 
 package com.mongodb.csfle;
 
-import main.java.com.mongodb.csfle.util.CSFLEHelpers;
+import com.mongodb.csfle.util.CSFLEHelpers;
 
 /*
  * - Reads master key from file "master-key.txt" in root directory of project

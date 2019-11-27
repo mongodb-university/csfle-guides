@@ -28,7 +28,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.UpdateOptions;
 
-import main.java.com.mongodb.csfle.util.CSFLEHelpers;
+import com.mongodb.csfle.util.CSFLEHelpers;
 
 /*
  * - Reads master key from file "master-key.txt" in root directory of project
