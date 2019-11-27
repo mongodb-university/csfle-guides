@@ -47,6 +47,8 @@ import com.mongodb.client.vault.ClientEncryptions;
  * Helper methods and sample data for this companion project.
  */
 public class CSFLEHelpers {
+    // You may need to update the following variable to point to your mongocryptd binary
+    private static String mongocryptdPath = "/usr/local/bin/mongocryptd";
 
     // Sample data
     public static String SAMPLE_NAME_VALUE = "John Doe";
@@ -133,9 +135,6 @@ public class CSFLEHelpers {
 
         return ClientEncryptions.create(clientEncryptionSettings);
     }
-
-    // You may need to update the following variable to point to your mongocryptd binary
-    private static String mongocryptdPath = "/usr/local/bin/mongocryptd";
 
     // Creates Encrypted Client which performs automatic encryption and decryption of fields
     public static MongoClient createEncryptedClient(String connectionString, String kmsProvider, byte[] masterKey, String keyVaultCollection, Document schema, String dataDb, String dataColl) {
