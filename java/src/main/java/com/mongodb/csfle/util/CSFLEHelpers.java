@@ -15,7 +15,7 @@
  *
  */
 
-package com.mongodb.csfle;
+package main.java.com.mongodb.csfle.util;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -79,7 +79,7 @@ public class CSFLEHelpers {
     private static String DETERMINISTIC_ENCRYPTION_TYPE = "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic";
     private static String RANDOM_ENCRYPTION_TYPE = "AEAD_AES_256_CBC_HMAC_SHA_512-Random";
 
-    private static Document buildEncryptedField(String keyId, String bsonType, Boolean isDeterministic) {
+    private static Document buildEncryptedField(String bsonType, Boolean isDeterministic) {
         return new Document().
                 append("encrypt", new Document()
                         .append("bsonType", bsonType)
@@ -88,7 +88,7 @@ public class CSFLEHelpers {
     }
 
     private static Document createEncryptMetadataSchema(String keyId) {
-        List<Document> keyIds = new ArrayList<Document>();
+        List<Document> keyIds = new ArrayList<>();
         keyIds.add(new Document()
                 .append("$binary", new Document()
                         .append("base64", keyId)
@@ -102,25 +102,25 @@ public class CSFLEHelpers {
         }
         return new Document().append("bsonType", "object").append("encryptMetadata", createEncryptMetadataSchema(keyId))
                 .append("properties", new Document()
-                        .append("ssn", buildEncryptedField(keyId, "int", true))
-                        .append("bloodType", buildEncryptedField(keyId, "string", false))
-                        .append("medicalRecords", buildEncryptedField(keyId, "array", false))
+                        .append("ssn", buildEncryptedField("int", true))
+                        .append("bloodType", buildEncryptedField("string", false))
+                        .append("medicalRecords", buildEncryptedField("array", false))
                         .append("insurance", new Document()
                                 .append("bsonType", "object")
                                 .append("properties",
-                                        new Document().append("policyNumber", buildEncryptedField(keyId, "int", true)))));
+                                        new Document().append("policyNumber", buildEncryptedField("int", true)))));
     }
 
     // Creates Normal Client
-    public static MongoClient createMongoClient(String connectionString) {
+    private static MongoClient createMongoClient(String connectionString) {
         return MongoClients.create(connectionString);
     }
 
     // Creates KeyVault which allows you to create a key as well as encrypt and decrypt fields
-    public static ClientEncryption createKeyVault(String connectionString, String kmsProvider, byte[] localMasterKey, String keyVaultCollection) {
-        Map<String, Object> masterKeyMap = new HashMap<String, Object>();
+    private static ClientEncryption createKeyVault(String connectionString, String kmsProvider, byte[] localMasterKey, String keyVaultCollection) {
+        Map<String, Object> masterKeyMap = new HashMap<>();
         masterKeyMap.put("key", localMasterKey);
-        Map<String, Map<String, Object>> kmsProviders = new HashMap<String, Map<String, Object>>();
+        Map<String, Map<String, Object>> kmsProviders = new HashMap<>();
         kmsProviders.put(kmsProvider, masterKeyMap);
 
         ClientEncryptionSettings clientEncryptionSettings = ClientEncryptionSettings.builder()
@@ -141,16 +141,16 @@ public class CSFLEHelpers {
     public static MongoClient createEncryptedClient(String connectionString, String kmsProvider, byte[] masterKey, String keyVaultCollection, Document schema, String dataDb, String dataColl) {
         String recordsNamespace = dataDb + "." + dataColl;
 
-        Map<String, BsonDocument> schemaMap = new HashMap<String, BsonDocument>();
+        Map<String, BsonDocument> schemaMap = new HashMap<>();
         schemaMap.put(recordsNamespace, BsonDocument.parse(schema.toJson()));
 
-        Map<String, Object> keyMap = new HashMap<String, Object>();
+        Map<String, Object> keyMap = new HashMap<>();
         keyMap.put("key", masterKey);
 
-        Map<String, Map<String, Object>> kmsProviders = new HashMap<String, Map<String, Object>>();
+        Map<String, Map<String, Object>> kmsProviders = new HashMap<>();
         kmsProviders.put(kmsProvider, keyMap);
 
-        Map<String, Object> extraOpts = new HashMap<String, Object>();
+        Map<String, Object> extraOpts = new HashMap<>();
         extraOpts.put("mongocryptdSpawnPath", mongocryptdPath);
         // uncomment the following line if you are running mongocryptd manually
         //      extraOpts.put("mongocryptdBypassSpawn", true);
