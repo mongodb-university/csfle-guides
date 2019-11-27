@@ -15,7 +15,7 @@
  *
  */
 
-package main.java.com.mongodb.csfle.util;
+package com.mongodb.csfle.util;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;

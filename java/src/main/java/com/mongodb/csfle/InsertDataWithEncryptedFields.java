@@ -15,7 +15,7 @@
  *
  */
 
-package main.java.com.mongodb.csfle;
+package com.mongodb.csfle;
 
 import static com.mongodb.client.model.Filters.eq;
 

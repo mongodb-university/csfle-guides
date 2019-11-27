@@ -15,7 +15,7 @@
  *
  */
 
-package main.java.com.mongodb.csfle;
+package com.mongodb.csfle;
 
 import main.java.com.mongodb.csfle.util.CSFLEHelpers;
 
