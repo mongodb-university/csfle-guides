@@ -17,19 +17,6 @@
 
 package com.mongodb.csfle.util;
 
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.bson.BsonBinary;
-import org.bson.BsonDocument;
-import org.bson.Document;
-import org.bson.conversions.Bson;
-
 import com.mongodb.AutoEncryptionSettings;
 import com.mongodb.ClientEncryptionSettings;
 import com.mongodb.ConnectionString;
@@ -42,19 +29,24 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.vault.DataKeyOptions;
 import com.mongodb.client.vault.ClientEncryption;
 import com.mongodb.client.vault.ClientEncryptions;
+import org.bson.BsonBinary;
+import org.bson.BsonDocument;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+
+import java.io.FileInputStream;
+import java.util.*;
 
 /*
  * Helper methods and sample data for this companion project.
  */
 public class CSFLEHelpers {
-    // You may need to update the following variable to point to your mongocryptd binary
-    private static String mongocryptdPath = "/usr/local/bin/mongocryptd";
 
     // Sample data
-    public static String SAMPLE_NAME_VALUE = "John Doe";
-    public static Integer SAMPLE_SSN_VALUE = 145014000;
+    public static final String SAMPLE_NAME_VALUE = "John Doe";
+    public static final Integer SAMPLE_SSN_VALUE = 145014000;
 
-    public static Document SAMPLE_DOC = new Document()
+    public static final Document SAMPLE_DOC = new Document()
             .append("name", SAMPLE_NAME_VALUE)
             .append("ssn", SAMPLE_SSN_VALUE)
             .append("bloodType", "AB-")
@@ -78,10 +70,10 @@ public class CSFLEHelpers {
     }
 
     // JSON Schema helpers
-    private static String DETERMINISTIC_ENCRYPTION_TYPE = "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic";
-    private static String RANDOM_ENCRYPTION_TYPE = "AEAD_AES_256_CBC_HMAC_SHA_512-Random";
-
     private static Document buildEncryptedField(String bsonType, Boolean isDeterministic) {
+        String DETERMINISTIC_ENCRYPTION_TYPE = "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic";
+        String RANDOM_ENCRYPTION_TYPE = "AEAD_AES_256_CBC_HMAC_SHA_512-Random";
+
         return new Document().
                 append("encrypt", new Document()
                         .append("bsonType", bsonType)
@@ -138,6 +130,9 @@ public class CSFLEHelpers {
 
     // Creates Encrypted Client which performs automatic encryption and decryption of fields
     public static MongoClient createEncryptedClient(String connectionString, String kmsProvider, byte[] masterKey, String keyVaultCollection, Document schema, String dataDb, String dataColl) {
+        // You may need to update the following variable to point to your mongocryptd binary
+        String mongocryptdPath = "/usr/local/bin/mongocryptd";
+
         String recordsNamespace = dataDb + "." + dataColl;
 
         Map<String, BsonDocument> schemaMap = new HashMap<>();
@@ -201,8 +196,11 @@ public class CSFLEHelpers {
     // Create data encryption key in the specified key collection
     // Call only after checking whether a data encryption key with same keyAltName exists
     public static String createDataEncryptionKey(String connectionString, String kmsProvider, byte[] localMasterKey, String keyVaultCollection, String keyAltName) {
+        List<String> keyAltNames = new ArrayList<>();
+        keyAltNames.add(keyAltName);
+
         try (ClientEncryption keyVault = createKeyVault(connectionString, kmsProvider, localMasterKey, keyVaultCollection)) {
-            BsonBinary dataKeyId = keyVault.createDataKey(kmsProvider, new DataKeyOptions().keyAltNames(Arrays.asList(keyAltName)));
+            BsonBinary dataKeyId = keyVault.createDataKey(kmsProvider, new DataKeyOptions().keyAltNames(keyAltNames));
 
             return Base64.getEncoder().encodeToString(dataKeyId.getData());
         }

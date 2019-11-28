@@ -17,18 +17,16 @@
 
 package com.mongodb.csfle;
 
-import static com.mongodb.client.model.Filters.eq;
-
-import org.bson.Document;
-import org.bson.conversions.Bson;
-
 import com.mongodb.ConnectionString;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.UpdateOptions;
-
 import com.mongodb.csfle.util.CSFLEHelpers;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+
+import static com.mongodb.client.model.Filters.eq;
 
 /*
  * - Reads master key from file "master-key.txt" in root directory of project
@@ -69,6 +67,9 @@ public class InsertDataWithEncryptedFields {
 
             // Query SSN field with encrypted client
             Document result = collection.find(ssnQuery).first();
+            if (result == null) {
+                throw new Exception("No query results were returned, please verify the document was inserted");
+            }
             System.out.println("Encrypted client query by the SSN (deterministically-encrypted) field:\n" + result.toJson());
         }
 
