@@ -22,11 +22,13 @@ from pymongo import MongoClient
 from pymongo.encryption_options import AutoEncryptionOpts
 from pymongo.encryption import ClientEncryption
 from bson.codec_options import CodecOptions
-from bson.binary import Binary, STANDARD, UUID
+from bson.binary import Binary, STANDARD, UUID_SUBTYPE
+from uuid import UUID
 
 
 def read_master_key(path="./master-key.txt"):
-    return Binary(open(path, "rb").read(96))
+    with open(path, "rb") as f:
+        return f.read(96)
 
 
 class CsfleHelper:
@@ -131,7 +133,7 @@ class CsfleHelper:
             "medicalRecords.patients": {
                 "bsonType": "object",
                 "encryptMetadata": {
-                    "keyId": [Binary(base64.b64decode(data_key), 4)]
+                    "keyId": [Binary(base64.b64decode(data_key), UUID_SUBTYPE)]
                 },
                 "properties": {
                     "insurance": {
