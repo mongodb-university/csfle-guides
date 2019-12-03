@@ -85,9 +85,10 @@ module.exports = {
         dataKey = await encryption.createDataKey("local", {
           keyAltNames: [this.keyAltNames]
         })
+        return dataKey.toString("base64")
       }
 
-      return dataKey
+      return dataKey["_id"].toString("base64")
     }
 
     async getRegularClient() {

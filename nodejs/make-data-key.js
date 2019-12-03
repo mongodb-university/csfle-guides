@@ -14,10 +14,7 @@ async function main() {
   const client = await csfleHelper.getRegularClient()
 
   const dataKey = await csfleHelper.findOrCreateDataKey(client)
-  console.log(
-    "Base64 data key. Copy and paste this into clients.js\t",
-    dataKey["_id"].toString("base64")
-  )
+  console.log("Base64 data key. Copy and paste this into clients.js\t", dataKey)
 
   client.close()
 }
