@@ -1,4 +1,9 @@
 data/
 node_modules/
 __pycache__/
-mongocryptd.pid
+java/bin/
+java/target/
+**/mongocryptd.pid
+.classpath
+.project
+*.pyc
