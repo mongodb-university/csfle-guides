@@ -14,7 +14,7 @@ dependencies {
     compile(
         [
             'org.mongodb:mongodb-crypt:1.0.0',
-            'org.mongodb:mongodb-driver-sync:3.11.2'
+            'org.mongodb:mongodb-driver-sync:3.12.0'
         ]
     )
 }
