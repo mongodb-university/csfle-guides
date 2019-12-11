@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/mongodb-university/csfle-guides#readme",
   "dependencies": {
-    "mongodb": "mongodb/node-mongodb-native#master",
-    "mongodb-client-encryption": "^1.0.0-rc0"
+    "mongodb": "^3.4.0",
+    "mongodb-client-encryption": "^1.0.0"
   }
 }
