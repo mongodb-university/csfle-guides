@@ -34,7 +34,9 @@ def main():
     }
 
     """
-    For Azure KMS, uncomment this block
+    For Azure KMS, uncomment this block. See https://docs.mongodb.com/drivers/security/client-side-field-level-encryption-local-key-to-kms
+    for more information on storing a master key on a KMS.
+
     kms_provider_name = "azure"
     kms_provider = {
         "azure": {
