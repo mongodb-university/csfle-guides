@@ -54,7 +54,7 @@ def main():
     master_key = {
         "keyName": "<Azure key name>",
         "keyVaultEndpoint": "<Azure key vault endpoint>",
-         "keyVersion": "<Azure key version>",
+        "keyVersion": "<Azure key version>",
     }
     """
 
