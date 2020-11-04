@@ -34,6 +34,11 @@ def main():
     }
 
     """
+    For AWS KMS, uncomment this block. See https://docs.mongodb.com/drivers/security/client-side-field-level-encryption-local-key-to-kms
+    for more information on storing a master key on a KMS.
+    """
+
+    """
     For Azure KMS, uncomment this block. See https://docs.mongodb.com/drivers/security/client-side-field-level-encryption-local-key-to-kms
     for more information on storing a master key on a KMS.
 
@@ -51,6 +56,11 @@ def main():
         "keyVaultEndpoint": "<Azure key vault endpoint>",
          "keyVersion": "<Azure key version>",
     }
+    """
+
+    """
+    For GCP KMS, uncomment this block. See https://docs.mongodb.com/drivers/security/client-side-field-level-encryption-local-key-to-kms
+    for more information on storing a master key on a KMS.
     """
 
     keyDb = "encryption"
