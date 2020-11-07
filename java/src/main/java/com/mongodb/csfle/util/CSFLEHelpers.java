@@ -1,3 +1,4 @@
+package com.mongodb.csfle.util;
 /*
  * Copyright 2008-present MongoDB, Inc.
 
@@ -15,7 +16,21 @@
  *
  */
 
-package com.mongodb.csfle.util;
+
+
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.bson.BsonBinary;
+import org.bson.BsonDocument;
+import org.bson.BsonString;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import com.mongodb.AutoEncryptionSettings;
 import com.mongodb.ClientEncryptionSettings;
@@ -29,13 +44,6 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.vault.DataKeyOptions;
 import com.mongodb.client.vault.ClientEncryption;
 import com.mongodb.client.vault.ClientEncryptions;
-import org.bson.BsonBinary;
-import org.bson.BsonDocument;
-import org.bson.Document;
-import org.bson.conversions.Bson;
-
-import java.io.FileInputStream;
-import java.util.*;
 
 /*
  * Helper methods and sample data for this companion project.
@@ -50,6 +58,7 @@ public class CSFLEHelpers {
             .append("name", SAMPLE_NAME_VALUE)
             .append("ssn", SAMPLE_SSN_VALUE)
             .append("bloodType", "AB-")
+            .append("keyAltNameField", "bloodTypeKey")
             .append("medicalRecords", Arrays.asList(
                     new Document().append("weight", "180"),
                     new Document().append("bloodPressure", "120/80")))
@@ -74,11 +83,12 @@ public class CSFLEHelpers {
         String DETERMINISTIC_ENCRYPTION_TYPE = "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic";
         String RANDOM_ENCRYPTION_TYPE = "AEAD_AES_256_CBC_HMAC_SHA_512-Random";
 
-        return new Document().
-                append("encrypt", new Document()
-                        .append("bsonType", bsonType)
-                        .append("algorithm",
-                                (isDeterministic) ? DETERMINISTIC_ENCRYPTION_TYPE : RANDOM_ENCRYPTION_TYPE));
+        Document fieldDetails = new Document()
+                .append("bsonType", bsonType)
+                .append("algorithm",
+                        (isDeterministic) ? DETERMINISTIC_ENCRYPTION_TYPE : RANDOM_ENCRYPTION_TYPE);
+
+        return new Document().append("encrypt", fieldDetails);
     }
 
     private static Document createEncryptMetadataSchema(String keyId) {
@@ -110,26 +120,11 @@ public class CSFLEHelpers {
         return MongoClients.create(connectionString);
     }
 
-    // Creates KeyVault which allows you to create a key as well as encrypt and decrypt fields
-    private static ClientEncryption createKeyVault(String connectionString, String kmsProvider, byte[] localMasterKey, String keyVaultCollection) {
-        Map<String, Object> masterKeyMap = new HashMap<>();
-        masterKeyMap.put("key", localMasterKey);
-        Map<String, Map<String, Object>> kmsProviders = new HashMap<>();
-        kmsProviders.put(kmsProvider, masterKeyMap);
-
-        ClientEncryptionSettings clientEncryptionSettings = ClientEncryptionSettings.builder()
-                .keyVaultMongoClientSettings(MongoClientSettings.builder()
-                        .applyConnectionString(new ConnectionString(connectionString))
-                        .build())
-                .keyVaultNamespace(keyVaultCollection)
-                .kmsProviders(kmsProviders)
-                .build();
-
-        return ClientEncryptions.create(clientEncryptionSettings);
-    }
 
     // Creates Encrypted Client which performs automatic encryption and decryption of fields
-    public static MongoClient createEncryptedClient(String connectionString, String kmsProvider, byte[] masterKey, String keyVaultCollection, Document schema, String dataDb, String dataColl) {
+    public static MongoClient createEncryptedClient(String connectionString, String kmsProvider,
+            Map<String, Map<String, Object>> kmsProviders,
+            String keyVaultCollection, Document schema, String dataDb, String dataColl) {
         // You may need to update the following variable to point to your mongocryptd binary
         String mongocryptdPath = "/usr/local/bin/mongocryptd";
 
@@ -138,11 +133,6 @@ public class CSFLEHelpers {
         Map<String, BsonDocument> schemaMap = new HashMap<>();
         schemaMap.put(recordsNamespace, BsonDocument.parse(schema.toJson()));
 
-        Map<String, Object> keyMap = new HashMap<>();
-        keyMap.put("key", masterKey);
-
-        Map<String, Map<String, Object>> kmsProviders = new HashMap<>();
-        kmsProviders.put(kmsProvider, keyMap);
 
         Map<String, Object> extraOpts = new HashMap<>();
         extraOpts.put("mongocryptdSpawnPath", mongocryptdPath);
@@ -195,14 +185,49 @@ public class CSFLEHelpers {
 
     // Create data encryption key in the specified key collection
     // Call only after checking whether a data encryption key with same keyAltName exists
-    public static String createDataEncryptionKey(String connectionString, String kmsProvider, byte[] localMasterKey, String keyVaultCollection, String keyAltName) {
+    public static String createDataEncryptionKey(
+            String connectionString,
+            Map<String, Object> masterKeyProperties,
+            Map<String, Map<String, Object>> kmsProviderProperties,
+            String keyVaultCollection,
+            String keyAltName) {
+
         List<String> keyAltNames = new ArrayList<>();
         keyAltNames.add(keyAltName);
 
-        try (ClientEncryption keyVault = createKeyVault(connectionString, kmsProvider, localMasterKey, keyVaultCollection)) {
-            BsonBinary dataKeyId = keyVault.createDataKey(kmsProvider, new DataKeyOptions().keyAltNames(keyAltNames));
+        try (ClientEncryption keyVault = createKeyVault(connectionString, kmsProviderProperties, keyVaultCollection)) {
+
+            BsonBinary dataKeyId = keyVault.createDataKey(masterKeyProperties.get("provider").toString(),
+                    createDataKeyOptions(masterKeyProperties).keyAltNames(keyAltNames));
 
             return Base64.getEncoder().encodeToString(dataKeyId.getData());
         }
     }
+
+    private static DataKeyOptions createDataKeyOptions(Map<String, Object> masterKeyProperties) {
+
+        BsonDocument doc = new BsonDocument();
+        for (Map.Entry<String, Object> prop : masterKeyProperties.entrySet()) {
+            doc.append(prop.getKey(), new BsonString(prop.getValue().toString()));
+        }
+
+        return new DataKeyOptions().masterKey(doc);
+    }
+
+    // Creates KeyVault which allows you to create a key as well as encrypt and decrypt fields
+    private static ClientEncryption createKeyVault(String connectionString,
+            Map<String, Map<String, Object>> kmsProviders,
+            String keyVaultCollection) {
+
+        ClientEncryptionSettings clientEncryptionSettings = ClientEncryptionSettings.builder()
+                .keyVaultMongoClientSettings(MongoClientSettings.builder()
+                        .applyConnectionString(new ConnectionString(connectionString))
+                        .build())
+                .keyVaultNamespace(keyVaultCollection)
+                .kmsProviders(kmsProviders)
+                .build();
+
+        return ClientEncryptions.create(clientEncryptionSettings);
+    }
+
 }
