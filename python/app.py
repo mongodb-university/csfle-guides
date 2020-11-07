@@ -36,6 +36,22 @@ def main():
     """
     For AWS KMS, uncomment this block. See https://docs.mongodb.com/drivers/security/client-side-field-level-encryption-local-key-to-kms
     for more information on storing a master key on a KMS.
+
+    kms_provider_name = "aws"
+    kms_providers = {
+        "aws": {
+            "accessKeyId": "<IAM User Access Key ID>",
+            "secretAccessKey": "<IAM User Secret Access Key>"
+        }
+    }
+
+    master_key = {
+    "aws": {
+        "region": "<Master Key AWS Regio>",
+        "key": "<Master Key ARN>",
+        "endpoint": "<AWS Custom Endpoint Host>" # optional
+    }
+
     """
 
     """
@@ -47,7 +63,8 @@ def main():
         "azure": {
             "tenantId": "<Azure account organization>",
             "clientId": "<Azure client ID>",
-            "clientSecret": "<Azure client secret>"
+            "clientSecret": "<Azure client secret>",
+            "identityPlatformEndpoint": "<Azure custom endpoint host>",
         }
     }
 
@@ -61,11 +78,27 @@ def main():
     """
     For GCP KMS, uncomment this block. See https://docs.mongodb.com/drivers/security/client-side-field-level-encryption-local-key-to-kms
     for more information on storing a master key on a KMS.
+
+    kms_provider_name = "gcp"
+    kms_provider = {
+        "gcp": {
+            "projectId": "<GCP project identifier>",
+            "location": "<GCP region>",
+            "keyRing": "<GCP key ring name>",
+            "keyName": "<GCP key name>",
+            "keyVersion": "<GCP key version>", # optional
+        }
+    }
+
+    master_key = {
+        "email": "<GCP service account email>",
+        "privateKey": "<GCP service account private key>",
+        "endpoint": "<GCP authentication endpoint>", # optional
+    }
     """
 
     keyDb = "encryption"
     keyColl = "__keyVault"
-    keyNamespace = f"{keyDb}.{keyColl}"
 
     dataDb = "records"
     dataColl = "patients"
@@ -93,7 +126,7 @@ def main():
     # Or comment this out if you already have a data key for your provider stored.
     data_key = CsfleHelper.key_from_base64("<paste the output make_data_key.py here>")
 
-    # if you already have a data key, uncomment the line below
+    # if you already have a data key or are using a remote KMS, uncomment the line below
     #data_key = csfle_helper.find_or_create_data_key()
 
     # set a JSON schema for automatic encryption
@@ -101,7 +134,7 @@ def main():
 
     encrypted_client = csfle_helper.get_csfle_enabled_client(schema)
 
-    # performing the insert operation with the csfle enabled client
+    # performing the insert operation with the CSFLE-enabled client
     # we're using an update with upsert so that subsequent runs of this script don't
     # add more documents
     encrypted_client.records.patients.update_one(
