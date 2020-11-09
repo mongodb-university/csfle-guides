@@ -13,7 +13,7 @@
 
     <dependency>
         <groupId>org.mongodb</groupId>
-        <artifactId>mongo-java-driver</artifactId>
+        <artifactId>mongodb-driver-sync</artifactId>
         <version>4.1.1</version>
     </dependency>
 
