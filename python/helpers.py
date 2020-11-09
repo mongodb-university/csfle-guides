@@ -19,12 +19,12 @@
 import base64
 
 from pymongo import MongoClient
+import pymongocrypt
 from pymongo.encryption_options import AutoEncryptionOpts
 from pymongo.encryption import ClientEncryption
 from bson.codec_options import CodecOptions
 from bson.binary import Binary, STANDARD, UUID_SUBTYPE
 from uuid import UUID
-
 
 def read_master_key(path="./master-key.txt"):
     with open(path, "rb") as f:
@@ -35,35 +35,40 @@ class CsfleHelper:
     """This is a helper class that aids in csfle implementation."""
 
     def __init__(self,
-
-                 kms_providers=None,
+                 kms_provider=None,
+                 kms_provider_name="local",
                  key_alt_name="demo-data-key",
                  key_db="encryption",
                  key_coll="__keyVault",
+                 master_key=None,
                  schema=None,
                  connection_string="mongodb://localhost:27017",
                  # setting this to True requires manually running mongocryptd
                  mongocryptd_bypass_spawn=False,
                  mongocryptd_spawn_path="mongocryptd"):
-        """If mongocryptd
-        is not installed to in your search path, ensure you override
-        mongocryptd_spawn_path
+        """
+        If mongocryptd is not installed to in your search path, ensure
+        you override mongocryptd_spawn_path
         """
         super().__init__()
-        if kms_providers is None:
+        if kms_provider is None:
             raise ValueError("kms_provider is required")
-        self.kms_providers = kms_providers
+        self.kms_provider = kms_provider
+        self.kms_provider_name = kms_provider_name
         self.key_alt_name = key_alt_name
         self.key_db = key_db
         self.key_coll = key_coll
+        self.master_key = master_key
         self.key_vault_namespace = f"{self.key_db}.{self.key_coll}"
         self.schema = schema
         self.connection_string = connection_string
         self.mongocryptd_bypass_spawn = mongocryptd_bypass_spawn
         self.mongocryptd_spawn_path = mongocryptd_spawn_path
 
-    def ensure_unique_index_on_key_vault(self, key_vault):
+    def key_from_base64(base64_key):
+        return Binary(base64.b64decode(base64_key), UUID_SUBTYPE)
 
+    def ensure_unique_index_on_key_vault(self, key_vault):
         # clients are required to create a unique partial index on keyAltNames
         key_vault.create_index("keyAltNames",
                                unique=True,
@@ -75,7 +80,7 @@ class CsfleHelper:
 
     def find_or_create_data_key(self):
         """
-        In the guide, https://docs.mongodb.com/ecosystem/use-cases/client-side-field-level-encryption-guide/,
+        In the guide, https://docs.mongodb.com/drivers/security/client-side-field-level-encryption-guide/,
         we create the data key and then show that it is created by
         using a find_one query. Here, in implementation, we only create the key if
         it doesn't already exist, ensuring we only have one local data key.
@@ -90,29 +95,29 @@ class CsfleHelper:
 
         self.ensure_unique_index_on_key_vault(key_vault)
 
-        data_key = key_vault.find_one(
-            {"keyAltNames": self.key_alt_name}
-        )
+        data_key = key_vault.find_one({"keyAltNames": self.key_alt_name})
 
+        # create a key
         if data_key is None:
-            with ClientEncryption(self.kms_providers,
+            with ClientEncryption(self.kms_provider,
                                   self.key_vault_namespace,
                                   key_vault_client,
                                   CodecOptions(uuid_representation=STANDARD)
                                   ) as client_encryption:
 
-                data_key = client_encryption.create_data_key(
-                    "local", key_alt_names=[self.key_alt_name])
-                uuid_data_key_id = UUID(bytes=data_key)
+                # create data key using local provider
+                if self.kms_provider is None:
+                    data_key = client_encryption.create_data_key(
+                        "local",
+                        key_alt_names=[self.key_alt_name])
 
-        else:
-            uuid_data_key_id = data_key["_id"]
+                # create data key using KMS master key
+                else:
+                    data_key = client_encryption.create_data_key(
+                        self.kms_provider_name,
+                        master_key=self.master_key)
 
-        base_64_data_key_id = (base64
-                               .b64encode(uuid_data_key_id.bytes)
-                               .decode("utf-8"))
-
-        return base_64_data_key_id
+        return data_key
 
     def get_regular_client(self):
         return MongoClient(self.connection_string)
@@ -121,19 +126,20 @@ class CsfleHelper:
         return MongoClient(
             self.connection_string,
             auto_encryption_opts=AutoEncryptionOpts(
-                self.kms_providers,
+                self.kms_provider,
                 self.key_vault_namespace,
                 mongocryptd_bypass_spawn=self.mongocryptd_bypass_spawn,
                 mongocryptd_spawn_path=self.mongocryptd_spawn_path,
                 schema_map=schema)
         )
 
-    def create_json_schema(self, data_key):
+    def create_json_schema(data_key, dbName, collName):
+        collNamespace = f"{dbName}.{collName}"
         return {
-            "medicalRecords.patients": {
+            collNamespace: {
                 "bsonType": "object",
                 "encryptMetadata": {
-                    "keyId": [Binary(base64.b64decode(data_key), UUID_SUBTYPE)]
+                    "keyId": [data_key]
                 },
                 "properties": {
                     "insurance": {
