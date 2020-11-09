@@ -22,6 +22,9 @@
    pip install -r requirements.txt
    ```
 
+   If you need to use Azure or GCP KMS, follow our instructions on
+   [how to build libmongocrypt from source](https://github.com/mongodb/libmongocrypt/tree/master/bindings/python#installing-from-source).
+
 4. Make sure you have the `master-key.txt` file in the root of your execution
    environment. This is a 96-byte cryptographically-secure generated master
    encryption key required to run this example project. To generate your own
