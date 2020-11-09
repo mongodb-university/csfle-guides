@@ -13,7 +13,7 @@ repositories {
 dependencies {
     compile(
         [
-            'org.mongodb:mongodb-crypt:1.1.0',
+            'org.mongodb:mongodb-crypt:1.1.0-beta1',
             'org.mongodb:mongodb-driver-sync:4.1.1'
         ]
     )
