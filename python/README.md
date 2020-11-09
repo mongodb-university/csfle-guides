@@ -26,7 +26,7 @@
    following command:
 
    ```
-   pip install pymongocrypt==1.0.1`
+   pip install pymongocrypt==1.0.1
    ```
 
    If you need to use Azure or GCP KMS, you need to build and install the
