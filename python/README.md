@@ -16,13 +16,21 @@
 3. We recommend that you create a local environment to encapsulate the
    dependencies. We use [**pyenv**](https://realpython.com/intro-to-pyenv/)
 
-   ```python
+   ```
    pyenv virtualenv 3.7.3 csfle
    pyenv local csfle
    pip install -r requirements.txt
    ```
 
-   If you need to use Azure or GCP KMS, follow our instructions on
+   If you need to use AWS KMS, install the `pymongocrypt` library using the
+   following command:
+
+   ```
+   pip install pymongocrypt==1.0.1`
+   ```
+
+   If you need to use Azure or GCP KMS, you need to build and install the
+   `pymongocrypt` library using our instructions on
    [how to build libmongocrypt from source](https://github.com/mongodb/libmongocrypt/tree/master/bindings/python#installing-from-source).
 
 4. Make sure you have the `master-key.txt` file in the root of your execution
