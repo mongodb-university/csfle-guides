@@ -8,9 +8,9 @@
    ```
    Work from the repository directory for the remainder of these
    instructions.
-   
+
 2. Start a `mongod` instance (Enterprise version >= 4.2) running on port 27017
-3. Set up your build environment for the Java (>= 1.8) project. The following 
+3. Set up your build environment for the Java (>= 1.8) project. The following
    build files are located in the project root:
    - `pom.xml` for [Maven](https://maven.apache.org/)
    - `build.gradle` for [Gradle](https://gradle.org/)
@@ -19,11 +19,19 @@
    execution environment. This is a 96-byte cryptographically-secure generated
    master encryption key required to run this example project. To generate your
    own master key or use a KMS, refer to the [CSFLE Use Case
-   Guide](https://docs.mongodb.com/ecosystem/use-cases/client-side-field-level-encryption-guide/).
+   Guide](https://docs.mongodb.com/drivers/security/client-side-field-level-encryption-guide/).
+
+   The settings for each supported KMS are included in
+   `DataEncryptionKeyCreator.java` and `InsertDataWithEncryptedFields.java`.
+   If you are using a cloud KMS provider, uncomment and assign your KMS
+   provider settings. See
+   [Use a KMS to Store the Master Key Guide](https://docs.mongodb.com/drivers/security/client-side-field-level-encryption-local-key-to-kms)
+   for more information on how to set up a master key and data encryption
+   key with on of the supported KMS providers.
 
 5. Make sure the `mongocryptd` path is correct in the `CSFLEHelpers.java`
    class.
-   
+
 6. Run the `main` method in `DataEncryptionKeyCreator.java` to insert
    a new data key in the **encryption.__keyVault** collection. Copy the key id
    that is printed on the console.

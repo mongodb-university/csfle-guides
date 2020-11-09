@@ -27,6 +27,14 @@
    encryption key required to run this example project. To generate your own
    master key or use a KMS, refer to the [CSFLE Use Case Guide](https://docs.mongodb.com/drivers/security/client-side-field-level-encryption-guide/).
 
+   The settings for each supported KMS are included in `app.py`. If you are
+   using a cloud KMS provider, uncomment and assign your KMS provider
+   settings. See
+   [Use a KMS to Store the Master Key Guide](https://docs.mongodb.com/drivers/security/client-side-field-level-encryption-local-key-to-kms)
+   for more information on how to set up a master key and data encryption
+   key with on of the supported KMS providers.
+
+
 5. Run the `make_data_key.py` script to make a data key. If there is an
    existing data key in the **encryption.__keyVault** collection this script
    will not create a duplicate data key.
