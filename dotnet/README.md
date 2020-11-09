@@ -21,7 +21,7 @@ Currently, remote KMS support is Windows only.
    execution environment if you are using a local KMS. This is a 96-byte cryptographically-secure generated
    master encryption key required to run this example project. To generate your
    own master key or use a KMS, refer to the [CSFLE Use Case
-   Guide](https://docs.mongodb.com/ecosystem/use-cases/client-side-field-level-encryption-guide/).
+   Guide](https://docs.mongodb.com/drivers/security/client-side-field-level-encryption-guide/).
 
 4. Configure variables for your preferred remote KMS, if
    necessary. Out of the box, this application looks for KMS credentials and data key options
@@ -36,8 +36,8 @@ Currently, remote KMS support is Windows only.
 
      - Master Key Options
 
-       - FLE_AWS_KEY_REGION
        - FLE_AWS_KEY_ARN
+       - FLE_AWS_KEY_REGION
        - FLE_AWS_ENDPOINT (Optional)
 
    - GCP
@@ -50,9 +50,9 @@ Currently, remote KMS support is Windows only.
 
      - Master Key Options
 
-       - FLE_GCP_PROJ_ID
-       - FLE_GCP_KEY_RING
        - FLE_GCP_KEY_NAME
+       - FLE_GCP_KEY_RING
+       - FLE_GCP_PROJ_ID
        - FLE_GCP_KEY_LOC (Optional)
        - FLE_GCP_KEY_VERSION (Optional)
        - FLE_GCP_KMS_ENDPOINT (Optional)
