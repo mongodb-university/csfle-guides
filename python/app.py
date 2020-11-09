@@ -64,7 +64,7 @@ def main():
             "tenantId": "<Azure account organization>",
             "clientId": "<Azure client ID>",
             "clientSecret": "<Azure client secret>",
-            "identityPlatformEndpoint": "<Azure custom endpoint host>",
+            "identityPlatformEndpoint": "<Azure custom endpoint host>", # optional
         }
     }
 
