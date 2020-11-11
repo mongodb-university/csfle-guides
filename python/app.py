@@ -47,7 +47,7 @@ def main():
 
     master_key = {
     "aws": {
-        "region": "<Master Key AWS Regio>",
+        "region": "<Master Key AWS Region>",
         "key": "<Master Key ARN>",
         "endpoint": "<AWS Custom Endpoint Host>" # optional
     }
@@ -145,7 +145,7 @@ def main():
     # be readable.
     # querying on an encrypted field using strict equality
     csfle_find_result = encrypted_client.records.patients.find_one({"ssn": example_document["ssn"]})
-    print(f"Document retreived with csfle enabled client:\n{csfle_find_result}\n")
+    print(f"Document retrieved with csfle enabled client:\n{csfle_find_result}\n")
     encrypted_client.close()
 
     # perform a read using the regular client. We expect some fields to be
