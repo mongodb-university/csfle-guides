@@ -7,3 +7,4 @@ java/target/
 .classpath
 .project
 *.pyc
+.env
