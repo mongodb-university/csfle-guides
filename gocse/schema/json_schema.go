@@ -16,7 +16,7 @@ func CreateJSONSchema(dataKeyBase64 string) (bson.Raw, error) {
 					"base64": "%s",
 					"subType": "04"
 				}
-	        }
+			}
 		]
 	},
 	"properties": {
