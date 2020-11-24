@@ -28,14 +28,13 @@
 4. If `mongocryptd` is not installed in your system path, ensure you specify its
    location in `csfle/encrypted_client.go` in the `EncryptedClient` function.
 
-5. Uncomment the initializer for hte KMS provider you would like to use in `main.go`
+5. Uncomment the initializer for the KMS provider you would like to use in `main.go`
 
    ```go
-   // awsKMS := kms.AWSProvider()
-   // azureKMS := kms.AzureProvider()
-   // gcpKMS := kms.GCPProvider()
-   localKMS := kms.LocalProvider(localKey)
-
+   // preferredProvider := kms.AWSProvider()
+   // preferredProvider := kms.AzureProvider()
+   // preferredProvider := kms.GCPProvider()
+   preferredProvider := kms.LocalProvider(localMasterKey())
    ```
 
 6. Run the `go run -tags=cse .`. This does the following:
@@ -45,7 +44,7 @@
    - Fetches the master key from the KMS and creates a data key in the **keyVault** collection.
    - Uses this newly created data key to finish setting up JSON schema for automatic encryption.
    - Creates a new, encrypted client configured for automatic CSFLE.
-   - Drops the `records.patients` collection and inserts a sample document with the encrypted client.
+   - Inserts a sample document with the encrypted client.
    - Issues a find operation with the encrypted client and prints it out, showing the document in unencrypted form.
    - Issues a find operation with an unencrypted client and prints it out, showing the fields specified for encryption are unreadable.
 

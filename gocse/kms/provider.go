@@ -66,17 +66,14 @@ func GCPProvider() *GCP {
 
 	return &GCP{
 		credentials: gcpKMSCredentials{
-			gcpEmail,
-			gcpPrivateKey,
-			"",
+			Email:      gcpEmail,
+			PrivateKey: gcpPrivateKey,
 		},
 		dataKeyOpts: gcpKMSDataKeyOpts{
-			gcpProjectID,
-			gcpLocation,
-			gcpKeyRing,
-			gcpKeyName,
-			"", // optional keyVersion, unused
-			"", // optional endpoint, unused
+			ProjectID: gcpProjectID,
+			Location:  gcpLocation,
+			KeyRing:   gcpKeyRing,
+			KeyName:   gcpKeyName,
 		},
 		name: "gcp",
 	}
@@ -172,15 +169,13 @@ func AzureProvider() *Azure {
 
 	return &Azure{
 		credentials: azureKMSCredentials{
-			azureTenantID,
-			azureClientID,
-			azureClientSecret,
-			"", // optional param we aren't using
+			TenantID:     azureTenantID,
+			ClientID:     azureClientID,
+			ClientSecret: azureClientSecret,
 		},
 		dataKeyOpts: azureKMSDataKeyOpts{
-			azureKeyVaultEndpoint,
-			azureKeyName,
-			"", // optional param we aren't using
+			KeyVaultEndpoint: azureKeyVaultEndpoint,
+			KeyName:          azureKeyName,
 		},
 		name: "azure",
 	}

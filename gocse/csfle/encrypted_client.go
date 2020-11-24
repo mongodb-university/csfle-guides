@@ -16,7 +16,7 @@ func EncryptedClient(keyVaultNamespace, uri string, schemaMap map[string]interfa
 		// "mongocryptdURI":, defaults to "mongodb://localhost:27020"
 		// "mongocryptdBypassSpawn":, defaults to false
 		// "mongocryptdSpawnPath":, defaults to an empty string and spawns mongocryptd from the system path
-		// "mongocryptdSpawnArgs":, defauls to ["--idleShutDownTimeoutSecs=60"]
+		// "mongocryptdSpawnArgs":, defauls to ["--idleShutdownTimeoutSecs=60"]
 	}
 	autoEncryptionOpts := options.AutoEncryption().
 		SetKmsProviders(provider.Credentials()).
@@ -32,9 +32,6 @@ func EncryptedClient(keyVaultNamespace, uri string, schemaMap map[string]interfa
 
 func InsertTestData(client *mongo.Client, doc interface{}, dbName, collName string) error {
 	collection := client.Database(dbName).Collection(collName)
-	if err := collection.Drop(context.TODO()); err != nil {
-		return fmt.Errorf("Drop error %v", err)
-	}
 
 	if _, err := collection.InsertOne(context.TODO(), doc); err != nil {
 		return fmt.Errorf("InsertOne error: %v", err)

@@ -18,6 +18,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+const (
+	keyVaultNamespace = "encryption.__keyVault"
+	uri               = "mongodb://localhost:27017"
+	dbName            = "medicalRecords"
+	collName          = "patients"
+)
+
 func localMasterKey() []byte {
 	if _, err := os.Stat("master-key.txt"); err == nil {
 		return getMasterKey()
@@ -43,13 +50,10 @@ func getMasterKey() []byte {
 func main() {
 	err := godotenv.Load()
 
-	keyVaultNamespace := "encryption.__keyVault"
-	uri := "mongodb://localhost:27017"
-
 	// preferredProvider := kms.AWSProvider()
-	preferredProvider := kms.AzureProvider()
+	// preferredProvider := kms.AzureProvider()
 	// preferredProvider := kms.GCPProvider()
-	// preferredProvider := kms.LocalProvider(localMasterKey())
+	preferredProvider := kms.LocalProvider(localMasterKey())
 
 	// getting the base64 representation of a new data key
 	dataKeyBase64, err := csfle.GetDataKey(keyVaultNamespace, uri, preferredProvider)
@@ -60,10 +64,8 @@ func main() {
 	// configuring our jsonSchema for automatic helpers
 	// the driver only uses this for encryption information,
 	// not to enforce schema constraints
+
 	schema := schema.CreateJSONSchema(dataKeyBase64)
-	doc := patient.GetExamplePatient()
-	dbName := "records"
-	collName := "patients"
 	schemaMap := map[string]interface{}{
 		dbName + "." + collName: schema,
 	}
@@ -76,6 +78,7 @@ func main() {
 	defer func() {
 		_ = eclient.Disconnect(context.TODO())
 	}()
+	doc := patient.GetExamplePatient()
 	// drop the collection and insert a new document with the encrypted client
 	csfle.InsertTestData(eclient, doc, dbName, collName)
 
