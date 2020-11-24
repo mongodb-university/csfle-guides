@@ -65,7 +65,10 @@ func main() {
 	// the driver only uses this for encryption information,
 	// not to enforce schema constraints
 
-	schema := schema.CreateJSONSchema(dataKeyBase64)
+	schema, err := schema.CreateJSONSchema(dataKeyBase64)
+	if err != nil {
+		log.Panic(err)
+	}
 	schemaMap := map[string]interface{}{
 		dbName + "." + collName: schema,
 	}

@@ -39,13 +39,22 @@
 
 6. Run the `go run -tags=cse .`. This does the following:
 
-   - Reads in the local key from `master-key.txt`
-   - Reads in configuration information for your preferred KMS.
-   - Fetches the master key from the KMS and creates a data key in the **keyVault** collection.
-   - Uses this newly created data key to finish setting up JSON schema for automatic encryption.
-   - Creates a new, encrypted client configured for automatic CSFLE.
-   - Inserts a sample document with the encrypted client.
-   - Issues a find operation with the encrypted client and prints it out, showing the document in unencrypted form.
-   - Issues a find operation with an unencrypted client and prints it out, showing the fields specified for encryption are unreadable.
+   - Local Key Management Service (KMS)
+
+     - Reads in the local key from `master-key.txt`
+
+   - Remote KMS
+
+     - Reads in configuration information for your preferred KMS.
+     - Fetches the master key from the KMS.
+
+   - Universally
+
+     - Creates a data key in the **keyVault** collection.
+     - Uses this newly created data key to finish setting up JSON schema for automatic encryption.
+     - Creates a new, encrypted client configured for automatic Client-Side Field Level Encryption (CSFLE).
+     - Inserts a sample document with the encrypted client.
+     - Issues a find operation with the encrypted client and prints it out, showing the document in unencrypted form.
+     - Issues a find operation with an unencrypted client and prints it out, showing the fields specified for encryption are unreadable.
 
 7. Update the code to insert a document with the regular client. What happens?

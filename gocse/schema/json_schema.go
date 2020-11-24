@@ -2,12 +2,11 @@ package schema
 
 import (
 	"fmt"
-	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func CreateJSONSchema(dataKeyBase64 string) bson.Raw {
+func CreateJSONSchema(dataKeyBase64 string) (bson.Raw, error) {
 	jsc := `{
 	"bsonType": "object",
 	"encryptMetadata": {
@@ -55,7 +54,7 @@ func CreateJSONSchema(dataKeyBase64 string) bson.Raw {
 	schema := fmt.Sprintf(jsc, dataKeyBase64)
 	var schemaDoc bson.Raw
 	if err := bson.UnmarshalExtJSON([]byte(schema), true, &schemaDoc); err != nil {
-		log.Fatalf("UnmarshalExtJSON error: %v", err)
+		return nil, fmt.Errorf("UnmarshalExtJSON error: %v", err)
 	}
-	return schemaDoc
+	return schemaDoc, nil
 }
