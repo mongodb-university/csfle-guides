@@ -53,6 +53,7 @@
      - Creates a data key in the **keyVault** collection.
      - Uses this newly created data key to finish setting up JSON schema for automatic encryption.
      - Creates a new, encrypted client configured for automatic Client-Side Field Level Encryption (CSFLE).
+     - Drops the `medicalRecords.patients` collection.
      - Inserts a sample document with the encrypted client.
      - Issues a find operation with the encrypted client and prints it out, showing the document in unencrypted form.
      - Issues a find operation with an unencrypted client and prints it out, showing the fields specified for encryption are unreadable.

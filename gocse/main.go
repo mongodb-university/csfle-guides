@@ -83,7 +83,9 @@ func main() {
 	}()
 	doc := patient.GetExamplePatient()
 	// drop the collection and insert a new document with the encrypted client
-	csfle.InsertTestData(eclient, doc, dbName, collName)
+	if err := csfle.InsertTestData(eclient, doc, dbName, collName); err != nil {
+		log.Panic(err)
+	}
 
 	// creating an unencrypted client for a read operation to verify encryption
 	uclient, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))

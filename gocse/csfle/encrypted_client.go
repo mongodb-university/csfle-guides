@@ -33,6 +33,10 @@ func EncryptedClient(keyVaultNamespace, uri string, schemaMap map[string]interfa
 func InsertTestData(client *mongo.Client, doc interface{}, dbName, collName string) error {
 	collection := client.Database(dbName).Collection(collName)
 
+	if err := collection.Drop(context.TODO()); err != nil {
+		return fmt.Errorf("Drop error: %v", err)
+	}
+
 	if _, err := collection.InsertOne(context.TODO(), doc); err != nil {
 		return fmt.Errorf("InsertOne error: %v", err)
 	}
