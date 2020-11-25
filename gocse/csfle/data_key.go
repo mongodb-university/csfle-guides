@@ -33,8 +33,7 @@ func GetDataKey(keyVaultNamespace, uri string, provider kms.Provider) (string, e
 	// specify the master key information that will be used to
 	// encrypt the data key(s) that will in turn be used to encrypt
 	// fields, and create the data key
-	dataKey := provider.DataKeyOpts()
-	dataKeyOpts := options.DataKey().SetMasterKey(dataKey)
+	dataKeyOpts := options.DataKey().SetMasterKey(provider.DataKeyOpts())
 	dataKeyID, err := clientEnc.CreateDataKey(context.TODO(), provider.Name(), dataKeyOpts)
 	if err != nil {
 		return "", fmt.Errorf("create data key error %v", err)
