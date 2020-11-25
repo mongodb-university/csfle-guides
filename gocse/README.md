@@ -43,7 +43,7 @@
 
      - Reads in the local key from `master-key.txt`
 
-   - When using a Key Management Service (KMS)
+   - When using a Key Management System (KMS)
 
      - Reads in configuration information for your preferred KMS.
      - Fetches the master key from the KMS.
