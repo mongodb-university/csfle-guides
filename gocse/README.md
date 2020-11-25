@@ -39,16 +39,16 @@
 
 6. Run the `go run -tags=cse .`. This does the following:
 
-   - Local Key Management Service (KMS)
+   - When using a local master key
 
      - Reads in the local key from `master-key.txt`
 
-   - Remote KMS
+   - When using a Key Management Service (KMS)
 
      - Reads in configuration information for your preferred KMS.
      - Fetches the master key from the KMS.
 
-   - Universally
+   - When using either
 
      - Creates a data key in the **keyVault** collection.
      - Uses this newly created data key to finish setting up JSON schema for automatic encryption.
