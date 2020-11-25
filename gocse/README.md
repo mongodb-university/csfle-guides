@@ -9,7 +9,7 @@
      cd csfle-guides/gocse
    ```
 
-   Work from the gocse directory for the remainder of these
+   Work from the `gocse` directory for the remainder of these
    instructions.
 
 2. Start a `mongod` instance (Enterprise version >= 4.2) running on port 27017
