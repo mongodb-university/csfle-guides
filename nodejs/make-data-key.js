@@ -15,8 +15,8 @@ ${dataKey}
 `
     );
   } finally {
-    await unencryptedClient.close();
+    if (unencryptedClient) await unencryptedClient.close();
   }
 }
-let unencryptedClient;
-main().catch(console.dir);
+let unencryptedClient = null;
+main(unencryptedClient).catch(console.dir);

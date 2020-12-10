@@ -123,7 +123,7 @@ module.exports = {
       return await client.connect();
     }
 
-    createJsonSchemaMap() {
+    createJsonSchemaMap(dataKey) {
       return {
         "medicalRecords.patients": {
           bsonType: "object",
