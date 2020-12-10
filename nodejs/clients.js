@@ -8,8 +8,8 @@ async function main() {
   let dataKey = null; // change this!
 
   let regularClient = await kmsClient.getRegularClient();
-  let schemeMap = kmsClient.createJsonSchemaMap(dataKey);
-  let csfleClient = await kmsClient.getCsfleEnabledClient(schemeMap);
+  let schemaMap = kmsClient.createJsonSchemaMap(dataKey);
+  let csfleClient = await kmsClient.getCsfleEnabledClient(schemaMap);
 
   let exampleDocument = {
     name: "Jon Doe",
