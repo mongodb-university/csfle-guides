@@ -58,7 +58,7 @@ async function main() {
   const regularFindResult = await regularClientPatientsColl.findOne({
     name: "Jon Doe",
   });
-  console.log("Document retreived with regular client:\n", regularFindResult);
+  console.log("Document retrieved with regular client:\n", regularFindResult);
 
   await regularClient.close();
   await csfleClient.close();
