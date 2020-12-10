@@ -48,7 +48,7 @@ async function main() {
     ssn: exampleDocument["ssn"],
   });
   console.log(
-    "Document retreived with csfle enabled client:\n",
+    "Document retrieved with csfle enabled client:\n",
     csfleFindResult
   );
 
