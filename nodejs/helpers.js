@@ -60,8 +60,7 @@ module.exports = {
             },
           });
       } catch (e) {
-        console.error(e);
-        process.exit(1);
+        throw new Error(e);
       }
     }
 
@@ -91,9 +90,9 @@ module.exports = {
         dataKey = await encryption.createDataKey(this.provider, {
           masterKey: this.masterKey,
         });
+        console.dir(Object.keys(encryption));
         return dataKey.toString("base64");
       }
-
       return dataKey["_id"].toString("base64");
     }
 
@@ -124,12 +123,7 @@ module.exports = {
       return await client.connect();
     }
 
-    createJsonSchemaMap(dataKey = null) {
-      if (dataKey === null) {
-        throw new Error(
-          "dataKey is a required argument. Ensure you've defined it in clients.js"
-        );
-      }
+    createJsonSchemaMap() {
       return {
         "medicalRecords.patients": {
           bsonType: "object",

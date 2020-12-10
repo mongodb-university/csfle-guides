@@ -3,13 +3,21 @@ require("dotenv").config();
 
 const kmsClient = kms.localCsfleHelper();
 
-async function main() {
-  // change this to the base64 encoded data key generated from make-data-key.js
-  let dataKey = null; // change this!
+async function main(regularClient, csfleClient) {
+  let dataKey = null; // change this to the base64 encoded data key generated from make-data-key.js
+  if (dataKey === null) {
+    Error.stackTraceLimit = 1;
+    let err = new Error(
+      `dataKey is required.
+Run make-data-key.js and ensure you copy and paste the output into client.js
+      `
+    );
+    throw err;
+  }
 
-  let regularClient = await kmsClient.getRegularClient();
+  regularClient = await kmsClient.getRegularClient();
   let schemaMap = kmsClient.createJsonSchemaMap(dataKey);
-  let csfleClient = await kmsClient.getCsfleEnabledClient(schemaMap);
+  csfleClient = await kmsClient.getCsfleEnabledClient(schemaMap);
 
   let exampleDocument = {
     name: "Jon Doe",
@@ -59,9 +67,14 @@ async function main() {
     name: "Jon Doe",
   });
   console.log("Document retrieved with regular client:\n", regularFindResult);
-
-  await regularClient.close();
-  await csfleClient.close();
 }
 
-main().catch(console.dir);
+let regularClient = null;
+let csfleClient = null;
+main(regularClient, csfleClient)
+  .catch(console.dir)
+  .finally(async () => {
+    if (regularClient) await regularClient.close();
+    if (csfleClient) await csfleClient.close();
+    process.exit(1);
+  });
