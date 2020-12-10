@@ -90,7 +90,6 @@ module.exports = {
         dataKey = await encryption.createDataKey(this.provider, {
           masterKey: this.masterKey,
         });
-        console.dir(Object.keys(encryption));
         return dataKey.toString("base64");
       }
       return dataKey["_id"].toString("base64");
