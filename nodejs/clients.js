@@ -5,7 +5,7 @@ const kmsClient = kms.localCsfleHelper();
 
 async function main() {
   // change this to the base64 encoded data key generated from make-data-key.js
-  let dataKey = "u7XnpRBzTCOCeKGndF/ieQ=="; // change this!
+  let dataKey = null; // change this!
 
   let regularClient = await kmsClient.getRegularClient();
   let schemeMap = kmsClient.createJsonSchemaMap(dataKey);
