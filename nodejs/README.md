@@ -13,7 +13,7 @@
 
 2. Start a locally running `mongod` instance (Enterprise version >= 4.2) running on port 27017
 
-3. Install the dependencies in `package.json`
+3. Install the dependencies in `package.json`. Node version 10 or 12 is required.
 
    ```js
    npm install
@@ -24,7 +24,17 @@
    encryption key required to run this example project. To generate your own
    master key or use a KMS, refer to the [CSFLE Use Case Guide](https://docs.mongodb.com/ecosystem/use-cases/client-side-field-level-encryption-guide/).
 
-5. Run the `make-data-key.js` script to make a data key. If there is an
+5. Edit the line
+
+   ```js
+   const kmsClient = kms.localCsfleHelper();
+   ```
+
+   to your preferred KMS provider (local, aws, azure, or gcp). The available KMS
+   providers and the values necessary to use them are listed in `kms.js`. In this project,
+   environmental variables are used and manged with a [`.env` file](https://www.npmjs.com/package/dotenv).
+
+6. Run the `make-data-key.js` script to make a data key. If there is an
    existing data key in the **encryption.\_\_keyVault** collection this script
    will not create a duplicate data key.
 
@@ -36,10 +46,18 @@
    this into `clients.js` where you see this line
 
    ```js
-   let dataKey = null // change this!
+   let dataKey = null;
    ```
 
-6. Run the `clients.js` script to insert a document with the CSFLE-enabled client
+7. Edit the line
+
+   ```js
+   const kmsClient = kms.localCsfleHelper();
+   ```
+
+   to your prefered KMS provider, the same used in `make-data-key.js`.`
+
+8. Run the `clients.js` script to insert a document with the CSFLE-enabled client
    and then read that document with it as well as a regular client. You
    will see that the CSFLE-enabled client prints the document out in plaintext,
    and the regular client prints the document out with encrypted fields in
@@ -50,4 +68,4 @@
    node clients.js
    ```
 
-7. Suggestion: Try inserting a document with the regular client. What happens?
+9. Suggestion: Try inserting a document with the regular client. What happens?

@@ -1,22 +1,22 @@
-const { readMasterKey, CsfleHelper } = require("./helpers")
+const kms = require("./kms");
+require("dotenv").config();
 
-async function main() {
-  const localMasterKey = readMasterKey()
+async function main(unencryptedClient) {
+  try {
+    const kmsClient = kms.localCsfleHelper();
 
-  const csfleHelper = new CsfleHelper({
-    kmsProviders: {
-      local: {
-        key: localMasterKey
-      }
-    }
-  })
+    unencryptedClient = await kmsClient.getRegularClient();
 
-  const client = await csfleHelper.getRegularClient()
+    const dataKey = await kmsClient.findOrCreateDataKey(unencryptedClient);
+    console.log(
+      `Base64 data key. Copy and paste this into clients.js:
 
-  const dataKey = await csfleHelper.findOrCreateDataKey(client)
-  console.log("Base64 data key. Copy and paste this into clients.js\t", dataKey)
-
-  client.close()
+${dataKey}
+`
+    );
+  } finally {
+    if (unencryptedClient) await unencryptedClient.close();
+  }
 }
-
-main().catch(console.dir)
+let unencryptedClient = null;
+main(unencryptedClient).catch(console.dir);
