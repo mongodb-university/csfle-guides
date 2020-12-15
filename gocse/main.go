@@ -23,6 +23,7 @@ const (
 	uri               = "mongodb://localhost:27017"
 	dbName            = "medicalRecords"
 	collName          = "patients"
+	keyAltNames       = "demo-data-key"
 )
 
 func localMasterKey() []byte {
@@ -56,7 +57,7 @@ func main() {
 	preferredProvider := kms.LocalProvider(localMasterKey())
 
 	// getting the base64 representation of a new data key
-	dataKeyBase64, err := csfle.GetDataKey(keyVaultNamespace, uri, preferredProvider)
+	dataKeyBase64, err := csfle.GetDataKey(keyVaultNamespace, uri, keyAltNames, preferredProvider)
 	if err != nil {
 		log.Fatalf("problem during data key creation: %v", err)
 	}
