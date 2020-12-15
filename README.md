@@ -9,3 +9,7 @@ For the Java implementation, see the `java` directory.
 For the Python implementation, see the `python` directory.
 
 For the Node.js implementation, see the `nodejs` directory.
+
+For the C# implementation, see the `dotnet` directory.
+
+For the Go implementation, see the `gocse` directory.
