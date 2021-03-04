@@ -26,6 +26,7 @@ from bson.codec_options import CodecOptions
 from bson.binary import Binary, STANDARD, UUID_SUBTYPE
 from uuid import UUID
 
+
 def read_master_key(path="./master-key.txt"):
     with open(path, "rb") as f:
         return f.read(96)
@@ -105,19 +106,14 @@ class CsfleHelper:
                                   CodecOptions(uuid_representation=STANDARD)
                                   ) as client_encryption:
 
-                # create data key using local provider
-                if self.kms_provider is None:
-                    data_key = client_encryption.create_data_key(
-                        "local",
-                        key_alt_names=[self.key_alt_name])
-
                 # create data key using KMS master key
-                else:
-                    data_key = client_encryption.create_data_key(
-                        self.kms_provider_name,
-                        master_key=self.master_key)
+                data_key = client_encryption.create_data_key(
+                    self.kms_provider_name,
+                    key_alt_names=[self.key_alt_name],
+                    master_key=self.master_key)
+                return base64.b64encode(data_key).decode('utf8')
 
-        return data_key
+        return base64.b64encode(data_key['_id'].bytes).decode('utf8')
 
     def get_regular_client(self):
         return MongoClient(self.connection_string)

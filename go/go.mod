@@ -1,4 +1,4 @@
-module github.com/mongodb-university/csfle-guides/gocse
+module github.com/mongodb-university/csfle-guides/go
 
 go 1.15
 
