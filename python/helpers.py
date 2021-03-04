@@ -107,13 +107,12 @@ class CsfleHelper:
                                   ) as client_encryption:
 
                 # create data key using KMS master key
-                data_key = client_encryption.create_data_key(
+                return client_encryption.create_data_key(
                     self.kms_provider_name,
                     key_alt_names=[self.key_alt_name],
                     master_key=self.master_key)
-                return base64.b64encode(data_key).decode('utf8')
 
-        return base64.b64encode(data_key['_id'].bytes).decode('utf8')
+        return data_key['_id'].bytes
 
     def get_regular_client(self):
         return MongoClient(self.connection_string)
