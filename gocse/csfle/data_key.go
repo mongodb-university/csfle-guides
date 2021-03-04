@@ -52,7 +52,7 @@ func GetDataKey(keyVaultNamespace, uri, keyAltNames string, provider kms.Provide
 		return base64.StdEncoding.EncodeToString(dataKeyID.Data), nil
 	}
 	if err != nil {
-		return "", fmt.Errorf("error when attemptin to find key")
+		return "", fmt.Errorf("error encountered while attempting to find key")
 	}
 
 	return base64.StdEncoding.EncodeToString(dataKey["_id"].(primitive.Binary).Data), nil
