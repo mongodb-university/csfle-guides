@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/mongodb-university/csfle-guides/gocse/kms"
+	"github.com/mongodb-university/csfle-guides/go/kms"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,7 +15,7 @@ import (
 
 // GetDataKey creates a new data key and returns the base64 encoding to be used
 // in schema configuration for automatic encryption
-func GetDataKey(keyVaultNamespace, uri, keyAltNames string, provider kms.Provider) (string, error) {
+func GetDataKey(keyVaultNamespace, uri, keyAltName string, provider kms.Provider) (string, error) {
 
 	// configuring encryption options by setting the keyVault namespace and the kms providers information
 	// we configure this client to fetch the master key so that we can
@@ -36,14 +36,20 @@ func GetDataKey(keyVaultNamespace, uri, keyAltNames string, provider kms.Provide
 	// look for a data key
 	keyVault := strings.Split(keyVaultNamespace, ".")
 	db := keyVault[0]
-	col := keyVault[1]
+	coll := keyVault[1]
 	var dataKey bson.M
-	err = keyVaultClient.Database(db).Collection(col).FindOne(context.TODO(), bson.M{"keyAltNames": keyAltNames}).Decode(&dataKey)
+	err = keyVaultClient.
+		Database(db).
+		Collection(coll).
+		FindOne(context.TODO(), bson.M{"keyAltNames": keyAltName}).
+		Decode(&dataKey)
 	if err == mongo.ErrNoDocuments {
 		// specify the master key information that will be used to
 		// encrypt the data key(s) that will in turn be used to encrypt
 		// fields, and create the data key
-		dataKeyOpts := options.DataKey().SetMasterKey(provider.DataKeyOpts()).SetKeyAltNames([]string{keyAltNames})
+		dataKeyOpts := options.DataKey().
+			SetMasterKey(provider.DataKeyOpts()).
+			SetKeyAltNames([]string{keyAltName})
 		dataKeyID, err := clientEnc.CreateDataKey(context.TODO(), provider.Name(), dataKeyOpts)
 		if err != nil {
 			return "", fmt.Errorf("create data key error %v", err)
