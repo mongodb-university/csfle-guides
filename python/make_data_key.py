@@ -33,9 +33,8 @@ def main():
     }
 
     csfle_helper = CsfleHelper(kms_provider=kms_provider)
-    data_key = csfle_helper.find_or_create_data_key()
-    print(data_key)
-    # data_key = base64.b64encode(binary_data_key).decode("utf-8")
+    binary_data_key = csfle_helper.find_or_create_data_key()
+    data_key = base64.b64encode(binary_data_key).decode("utf-8")
 
     print("Base64 data key. Copy and paste this into app.py\t", data_key)
 
