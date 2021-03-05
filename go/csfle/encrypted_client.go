@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/mongodb-university/csfle-guides/gocse/kms"
+	"github.com/mongodb-university/csfle-guides/go/kms"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )

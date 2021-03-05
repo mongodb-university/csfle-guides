@@ -9,10 +9,10 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/mongodb-university/csfle-guides/gocse/csfle"
-	"github.com/mongodb-university/csfle-guides/gocse/kms"
-	"github.com/mongodb-university/csfle-guides/gocse/patient"
-	"github.com/mongodb-university/csfle-guides/gocse/schema"
+	"github.com/mongodb-university/csfle-guides/go/csfle"
+	"github.com/mongodb-university/csfle-guides/go/kms"
+	"github.com/mongodb-university/csfle-guides/go/patient"
+	"github.com/mongodb-university/csfle-guides/go/schema"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -23,6 +23,7 @@ const (
 	uri               = "mongodb://localhost:27017"
 	dbName            = "medicalRecords"
 	collName          = "patients"
+	keyAltName        = "demo-data-key"
 )
 
 func localMasterKey() []byte {
@@ -56,7 +57,7 @@ func main() {
 	preferredProvider := kms.LocalProvider(localMasterKey())
 
 	// getting the base64 representation of a new data key
-	dataKeyBase64, err := csfle.GetDataKey(keyVaultNamespace, uri, preferredProvider)
+	dataKeyBase64, err := csfle.GetDataKey(keyVaultNamespace, uri, keyAltName, preferredProvider)
 	if err != nil {
 		log.Fatalf("problem during data key creation: %v", err)
 	}

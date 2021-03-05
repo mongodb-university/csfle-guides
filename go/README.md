@@ -6,10 +6,10 @@
 
    ```sh
      git clone https://github.com/mongodb-university/csfle-guides.git
-     cd csfle-guides/gocse
+     cd csfle-guides/go
    ```
 
-   Work from the `gocse` directory for the remainder of these
+   Work from the `go` directory for the remainder of these
    instructions.
 
 2. Start a `mongod` instance (Enterprise version >= 4.2) running on port 27017
@@ -37,7 +37,7 @@
    preferredProvider := kms.LocalProvider(localMasterKey())
    ```
 
-6. Run the `go run -tags=cse .`. This does the following:
+6. Run the `go run -tags=cse main.go`. This does the following:
 
    - When using a local master key
 
