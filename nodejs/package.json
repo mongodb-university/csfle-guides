@@ -19,7 +19,7 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "mongodb": "^3.6.0",
-    "mongodb-client-encryption": "1.1.1-beta.0"
+    "mongodb-client-encryption": "1.2.6"
   },
   "prettier": {
     "semi": true
