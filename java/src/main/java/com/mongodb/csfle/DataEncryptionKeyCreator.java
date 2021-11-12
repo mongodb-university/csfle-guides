@@ -39,67 +39,16 @@ public class DataEncryptionKeyCreator {
         Map<String, Object> masterKeyProperties = new HashMap<>();
         Map<String, Map<String, Object>> kmsProviderProperties = new HashMap<>();
 
-        /* START: Local master key block */
-        String kmsProvider = "local";
-
-        masterKeyProperties.put("provider", kmsProvider);
-        byte[] masterKey = CSFLEHelpers.readMasterKey("./master-key.txt");
-        masterKeyProperties.put("key", masterKey);
-
-        Map<String, Object> localMasterKey = new HashMap<>();
-        localMasterKey.put("key",  masterKey);
-        kmsProviderProperties.put(kmsProvider, localMasterKey);
-        /* END: Local master key block */
-
         /*
-         * AWS KMS
-         * Uncomment this block to use your AWS KMS provider key
-         String kmsProvider = "aws";
-         masterKeyProperties.put("provider", kmsProvider);
-         masterKeyProperties.put("key", "<Master Key ARN>");
-         masterKeyProperties.put("region", "<Master Key AWS Region>");
-         masterKeyProperties.put("endpoint", "<AWS Custom Endpoint Host>"); // optional
-
-         Map<String, Object> providerDetails = new HashMap<>();
-         providerDetails.put("accessKeyId", "<IAM User Access Key ID>");
-         providerDetails.put("secretAccessKey","<IAM User Secret Access Key>");
-         kmsProviders.put(kmsProvider,  providerDetails);
-        */
-
-        /*
-         * Azure KMS
-         * Uncomment this block to use your Azure KMS provider key
-         String kmsProvider = "azure";
-         masterKeyProperties.put("provider", kmsProvider);
-         masterKeyProperties.put("keyName": "<Azure key name>");
-         masterKeyProperties.put("keyVersion": "<Azure key version>");
-         masterKeyProperties.put("keyVaultEndpoint": "<Azure key vault endpoint");
-
-         Map<String, Object> providerDetails = new HashMap<>();
-         providerDetails.put("tenantId", "<Azure account organization>");
-         providerDetails.put("clientId", "<Azure client ID>");
-         providerDetails.put("clientSecret", "<Azure client secret>");
-         providerDetails.put("identityPlatformEndpoint", "<Azure custom endpoint host>"); // optional
-         kmsProviders.put(kmsProvider, providerDetails);
+         * KMIP KMS
          */
-
-        /*
-         * GCP KMS
-         * Uncomment this block to use your GCP KMS provider key
-         String kmsProvider = "gcp";
-         masterKeyProperties.put("provider", kmsProvider);
-         masterKeyProperties.put("projectId", "<GCP project identifier>");
-         masterKeyProperties.put("location", "<GCP region>");
-         masterKeyProperties.put("keyRing", "<GCP key ring name>");
-         masterKeyProperties.put("keyName", "<GCP key name>");
-         masterKeyProperties.put("keyVersion", "<GCP key version>"); // optional
+         String kmsProvider = "kmip";
+         masterKeyProperties.put("provider", "kmip");
+         masterKeyProperties.put("keyId", "1");
 
          Map<String, Object> providerDetails = new HashMap<>();
-         providerDetails.put("email", "<GCP service account email>");
-         providerDetails.put("privateKey","<GCP service account private key>");
-         providerDetails.put("endpoint", "<GCP authentication endpoint>"); // optional
-         kmsProviders.put(kmsProvider,  providerDetails);
-        */
+         providerDetails.put("endpoint", "localhost:5698");
+         kmsProviderProperties.put(kmsProvider,  providerDetails);
 
         // Ensure index exists on key vault
         CSFLEHelpers.createKeyVaultIndex(connectionString, keyDb, keyColl);
