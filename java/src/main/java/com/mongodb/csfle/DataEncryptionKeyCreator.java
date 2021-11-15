@@ -17,10 +17,19 @@ package com.mongodb.csfle;
  */
 
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.mongodb.csfle.util.CSFLEHelpers;;
+import com.mongodb.csfle.util.CSFLEHelpers;;import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
 
 /*
  * - Reads master key from file "master-key.txt" in root directory of project, or creates one on a KMS
@@ -48,6 +57,9 @@ public class DataEncryptionKeyCreator {
 
          Map<String, Object> providerDetails = new HashMap<>();
          providerDetails.put("endpoint", "localhost:5698");
+         Map<String, SSLContext> SSLContext = new HashMap<>();
+         String path = "/Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home/lib/security/cacerts";
+         SSLContext.put("kmip", sslContext(path, "testpw"));
          kmsProviderProperties.put(kmsProvider,  providerDetails);
 
         // Ensure index exists on key vault
@@ -62,8 +74,32 @@ public class DataEncryptionKeyCreator {
             System.exit(0);
         }
 
-        encryptionKey = CSFLEHelpers.createDataEncryptionKey(connectionString, masterKeyProperties, kmsProviderProperties, keyVaultCollection, keyAltName);
+        encryptionKey = CSFLEHelpers.createDataEncryptionKey(connectionString, masterKeyProperties, kmsProviderProperties, keyVaultCollection, SSLContext,keyAltName);
 
         System.out.println("Congratulations on creating a new data encryption key! Copy the key below and paste it into InsertDataWithEncryptedfields.java\n" + encryptionKey);
     }
+
+    private static SSLContext sslContext(String keystoreFile, String password)
+            throws GeneralSecurityException, IOException {
+        KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+        try (InputStream in = new FileInputStream(keystoreFile)) {
+            keystore.load(in, password.toCharArray());
+        }
+        KeyManagerFactory keyManagerFactory =
+                KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        keyManagerFactory.init(keystore, password.toCharArray());
+
+        TrustManagerFactory trustManagerFactory =
+                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        trustManagerFactory.init(keystore);
+
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(
+                keyManagerFactory.getKeyManagers(),
+                trustManagerFactory.getTrustManagers(),
+                new SecureRandom());
+
+        return sslContext;
+    }
+
 }
