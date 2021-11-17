@@ -55,3 +55,18 @@
      human-readable.
 
 9. Update the code to insert a document with the regular client. What happens?
+
+
+## KMIP Steps
+
+Run `direnv allow` to add the `KEYSTORE_PASSWORD` environment variable.
+
+If you have a keystore already set up, replace this environment variable with the password of your keystore.
+
+Run `source .configure_certs.sh` to download the drivers tools repo, install certificates, and start the KMIP
+server.
+
+Once the server is running, run `mvn compile exec:java -Dexec.mainClass="com.mongodb.csfle.DataEncryptionKeyCreator"`
+from the `.../csfle-examples/java` directory.
+
+Complete the remainder of the guide as is done with KMS providers other than KMIP.
