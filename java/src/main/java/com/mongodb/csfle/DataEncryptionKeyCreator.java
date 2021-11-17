@@ -61,9 +61,8 @@ public class DataEncryptionKeyCreator {
             System.exit(0);
         }
 
-        encryptionKey = CSFLEHelpers.createDataEncryptionKey(connectionString, masterKeyProperties, kmsProviderProperties, keyVaultCollection,keyAltName);
+        encryptionKey = CSFLEHelpers.createDataEncryptionKey(connectionString, masterKeyProperties, kmsProviderProperties, keyVaultCollection, keyAltName);
 
         System.out.println("Congratulations on creating a new data encryption key! Copy the key below and paste it into InsertDataWithEncryptedfields.java\n" + encryptionKey);
     }
-
 }
