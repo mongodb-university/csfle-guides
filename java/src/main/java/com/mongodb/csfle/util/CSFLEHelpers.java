@@ -45,8 +45,6 @@ import com.mongodb.client.model.vault.DataKeyOptions;
 import com.mongodb.client.vault.ClientEncryption;
 import com.mongodb.client.vault.ClientEncryptions;
 
-import javax.net.ssl.SSLContext;
-
 /*
  * Helper methods and sample data for this companion project.
  */
@@ -198,7 +196,6 @@ public class CSFLEHelpers {
         keyAltNames.add(keyAltName);
 
         try (ClientEncryption keyVault = createKeyVault(connectionString, kmsProviderProperties, keyVaultCollection)) {
-
 
             BsonBinary dataKeyId = keyVault.createDataKey(masterKeyProperties.get("provider").toString(),
                     createDataKeyOptions(masterKeyProperties).keyAltNames(keyAltNames));

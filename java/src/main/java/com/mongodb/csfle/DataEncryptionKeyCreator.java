@@ -19,7 +19,7 @@ package com.mongodb.csfle;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.mongodb.csfle.util.CSFLEHelpers;;import javax.net.ssl.*;
+import com.mongodb.csfle.util.CSFLEHelpers;;
 
 /*
  * - Reads master key from file "master-key.txt" in root directory of project, or creates one on a KMS
@@ -33,7 +33,7 @@ public class DataEncryptionKeyCreator {
         String keyDb = "encryption";
         String keyColl = "__keyVault";
         String keyVaultCollection = String.join(".", keyDb, keyColl);
-        String keyAltName = "altname";
+        String keyAltName = "demo-data-key";
 
         Map<String, Object> masterKeyProperties = new HashMap<>();
         Map<String, Map<String, Object>> kmsProviderProperties = new HashMap<>();
