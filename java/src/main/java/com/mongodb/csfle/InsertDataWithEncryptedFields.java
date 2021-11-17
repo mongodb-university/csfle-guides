@@ -83,6 +83,13 @@ public class InsertDataWithEncryptedFields {
         providerDetails.put("clientId", "<Azure client ID>");
         providerDetails.put("clientSecret", "<Azure client secret>");
         providerDetails.put("identityPlatformEndpoint", "<Azure custom endpoint host>"); // optional
+        /*
+         * KMIP KMS
+         * Uncomment this block to use your AWS KMS provider key
+         */
+        String kmsProvider = "kmip";
+        providerDetails.put("endpoint", "localhost:5698");
+
         kmsProviders.put(kmsProvider, providerDetails);
         */
 

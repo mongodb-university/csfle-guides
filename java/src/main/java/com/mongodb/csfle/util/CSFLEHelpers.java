@@ -192,13 +192,12 @@ public class CSFLEHelpers {
             Map<String, Object> masterKeyProperties,
             Map<String, Map<String, Object>> kmsProviderProperties,
             String keyVaultCollection,
-            Map<String, SSLContext> sslContext,
             String keyAltName) {
 
         List<String> keyAltNames = new ArrayList<>();
         keyAltNames.add(keyAltName);
 
-        try (ClientEncryption keyVault = createKeyVault(connectionString, kmsProviderProperties, sslContext, keyVaultCollection)) {
+        try (ClientEncryption keyVault = createKeyVault(connectionString, kmsProviderProperties, keyVaultCollection)) {
 
 
             BsonBinary dataKeyId = keyVault.createDataKey(masterKeyProperties.get("provider").toString(),
@@ -220,7 +219,7 @@ public class CSFLEHelpers {
 
     // Creates KeyVault which allows you to create a key as well as encrypt and decrypt fields
     private static ClientEncryption createKeyVault(String connectionString,
-            Map<String, Map<String, Object>> kmsProviders, Map<String, SSLContext> contextMap,
+            Map<String, Map<String, Object>> kmsProviders,
             String keyVaultCollection) {
 
         ClientEncryptionSettings clientEncryptionSettings = ClientEncryptionSettings.builder()
@@ -229,7 +228,6 @@ public class CSFLEHelpers {
                         .build())
                 .keyVaultNamespace(keyVaultCollection)
                 .kmsProviders(kmsProviders)
-                .kmsProviderSslContextMap(contextMap)
                 .build();
 
         return ClientEncryptions.create(clientEncryptionSettings);
