@@ -92,7 +92,6 @@ public class InsertDataWithEncryptedFields {
         providerDetails.put("endpoint", "localhost:5698");
 
         kmsProviders.put(kmsProvider, providerDetails);
-        */
 
         /*
          * GCP KMS
