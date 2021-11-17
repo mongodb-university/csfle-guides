@@ -43,7 +43,7 @@ public class DataEncryptionKeyCreator {
         String keyDb = "encryption";
         String keyColl = "__keyVault";
         String keyVaultCollection = String.join(".", keyDb, keyColl);
-        String keyAltName = "demo-data-key";
+        String keyAltName = "altname";
 
         Map<String, Object> masterKeyProperties = new HashMap<>();
         Map<String, Map<String, Object>> kmsProviderProperties = new HashMap<>();
@@ -93,7 +93,7 @@ public class DataEncryptionKeyCreator {
                 TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         trustManagerFactory.init(keystore);
 
-        SSLContext sslContext = SSLContext.getInstance("TLS");
+        SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
         sslContext.init(
                 keyManagerFactory.getKeyManagers(),
                 trustManagerFactory.getTrustManagers(),

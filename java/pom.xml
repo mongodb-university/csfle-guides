@@ -7,6 +7,14 @@
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <Djavax.net.ssl.enabled> true </Djavax.net.ssl.enabled>
+    <Djavax.net.ssl.keyStoreType> pkcs12 </Djavax.net.ssl.keyStoreType>
+    <Djavax.net.ssl.keyStore> /Users/alek.binion/projects/csfle-guides/java/client.pkc </Djavax.net.ssl.keyStore>
+    <Djavax.net.ssl.keyStorePassword> testpw </Djavax.net.ssl.keyStorePassword>
+    <Djavax.net.ssl.trustStoreType> jks </Djavax.net.ssl.trustStoreType>
+    <Djavax.net.ssl.trustStore> /Users/alek.binion/projects/csfle-guides/java/mongo-truststore </Djavax.net.ssl.trustStore>
+    <Djavax.net.ssl.trustStorePassword> testpw </Djavax.net.ssl.trustStorePassword>
+    <Djavax.net.debug> all </Djavax.net.debug>
   </properties>
 
   <dependencies>
@@ -23,9 +31,25 @@
         <version>1.3.0</version>
     </dependency>
 
+      <dependency>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-classic</artifactId>
+          <version>1.2.3</version>
+      </dependency>
+
   </dependencies>
 
   <build>
     <finalName>${project.artifactId}</finalName>
+      <plugins>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <configuration>
+                  <source>8</source>
+                  <target>8</target>
+              </configuration>
+          </plugin>
+      </plugins>
   </build>
 </project>
