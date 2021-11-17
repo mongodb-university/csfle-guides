@@ -56,34 +56,6 @@ public class InsertDataWithEncryptedFields {
         Map<String, Map<String, Object>> kmsProviders = new HashMap<>();
         Map<String, Object> providerDetails = new HashMap<>();
 
-        /* START: Local master key block */
-        String kmsProvider = "local";
-        // Read the local master key from the provided file
-        byte[] masterKey = CSFLEHelpers.readMasterKey("./master-key.txt");
-
-        Map<String, Object> providerDetails = new HashMap<>();
-        providerDetails.put("key", masterKey);
-
-        kmsProviders.put("local", providerDetails);
-        /* END: Local master key block */
-
-        /*
-         * AWS KMS
-         * Uncomment this block to use your AWS KMS provider key
-        String kmsProvider = "aws";
-        providerDetails.put("accessKeyId", "<IAM User Access Key ID>");
-        providerDetails.put("secretAccessKey", "<IAM User Secret Access Key>");
-        kmsProviders.put(kmsProvider, providerDetails);
-        */
-
-        /* Azure KMS
-         * Uncomment this block to use your Azure KMS provider key
-        String kmsProvider = "azure";
-        Map<String, Object> providerDetails = new HashMap<>();
-        providerDetails.put("tenantId", "<Azure account organization>");
-        providerDetails.put("clientId", "<Azure client ID>");
-        providerDetails.put("clientSecret", "<Azure client secret>");
-        providerDetails.put("identityPlatformEndpoint", "<Azure custom endpoint host>"); // optional
         /*
          * KMIP KMS
          * Uncomment this block to use your AWS KMS provider key
