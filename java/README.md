@@ -60,7 +60,7 @@
 
 **KMIP support in this guide is to be considered "best effort"**.
 
-KMIP requires the `direnv` tool for setting environment variables. 
+This guide uses the `direnv` tool to manage environment variables. 
 
 Update the `TRUSTSTORE_PASSWORD` environment variable in your `.envrc` file to your global Java TrustStore password.
 
