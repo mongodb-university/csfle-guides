@@ -94,11 +94,12 @@ public class DataEncryptionKeyCreator {
          masterKeyProperties.put("keyName", "<GCP key name>");
          masterKeyProperties.put("keyVersion", "<GCP key version>"); // optional
 
+         Map<String, Object> providerDetails = new HashMap<>();
          providerDetails.put("email", "<GCP service account email>");
          providerDetails.put("privateKey","<GCP service account private key>");
          providerDetails.put("endpoint", "<GCP authentication endpoint>"); // optional
          kmsProviders.put(kmsProvider,  providerDetails);
-         */
+        */
 
         /*
          * KMIP KMS
