@@ -16,6 +16,7 @@ package com.mongodb.csfle;
  *
  */
 
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +39,6 @@ public class DataEncryptionKeyCreator {
         Map<String, Object> masterKeyProperties = new HashMap<>();
         Map<String, Map<String, Object>> kmsProviderProperties = new HashMap<>();
 
-
         /* START: Local master key block */
         String kmsProvider = "local";
 
@@ -59,6 +59,7 @@ public class DataEncryptionKeyCreator {
          masterKeyProperties.put("key", "<Master Key ARN>");
          masterKeyProperties.put("region", "<Master Key AWS Region>");
          masterKeyProperties.put("endpoint", "<AWS Custom Endpoint Host>"); // optional
+
          Map<String, Object> providerDetails = new HashMap<>();
          providerDetails.put("accessKeyId", "<IAM User Access Key ID>");
          providerDetails.put("secretAccessKey","<IAM User Secret Access Key>");
@@ -73,12 +74,31 @@ public class DataEncryptionKeyCreator {
          masterKeyProperties.put("keyName": "<Azure key name>");
          masterKeyProperties.put("keyVersion": "<Azure key version>");
          masterKeyProperties.put("keyVaultEndpoint": "<Azure key vault endpoint");
+
          Map<String, Object> providerDetails = new HashMap<>();
          providerDetails.put("tenantId", "<Azure account organization>");
          providerDetails.put("clientId", "<Azure client ID>");
          providerDetails.put("clientSecret", "<Azure client secret>");
          providerDetails.put("identityPlatformEndpoint", "<Azure custom endpoint host>"); // optional
          kmsProviders.put(kmsProvider, providerDetails);
+         */
+
+        /*
+         * GCP KMS
+         * Uncomment this block to use your GCP KMS provider key
+         String kmsProvider = "gcp";
+         masterKeyProperties.put("provider", kmsProvider);
+         masterKeyProperties.put("projectId", "<GCP project identifier>");
+         masterKeyProperties.put("location", "<GCP region>");
+         masterKeyProperties.put("keyRing", "<GCP key ring name>");
+         masterKeyProperties.put("keyName", "<GCP key name>");
+         masterKeyProperties.put("keyVersion", "<GCP key version>"); // optional
+
+         providerDetails.put("email", "<GCP service account email>");
+         providerDetails.put("privateKey","<GCP service account private key>");
+         providerDetails.put("endpoint", "<GCP authentication endpoint>"); // optional
+         kmsProviders.put(kmsProvider,  providerDetails);
+         */
 
         /*
          * KMIP KMS
