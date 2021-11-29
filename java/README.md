@@ -56,7 +56,11 @@
 
 9. Update the code to insert a document with the regular client. What happens?
 
-## KMIP Steps
+## KMIP
+
+**KMIP support in this guide is to be considered "best effort"**.
+
+KMIP requires the `direnv` tool for setting environment variables. 
 
 Run `direnv allow` to add the `KEYSTORE_PASSWORD` environment variable.
 
@@ -68,7 +72,6 @@ server.
 Once the server is running, run `mvn compile exec:java -Dexec.mainClass="com.mongodb.csfle.DataEncryptionKeyCreator"`
 from the `csfle-examples/java` directory to create a data encryption key.
 
-Once you have created your key, run `mvn compile exec:java -Dexec.mainClass="com.mongodb.csfle.InsertDataWithEncryptedFields"`
+Once you have created your key, add your key to your `InsertDataWithEncryptedFields` class and run 
+`mvn compile exec:java -Dexec.mainClass="com.mongodb.csfle.InsertDataWithEncryptedFields"`
 from the `csfle-examples/java` directory to insert an encrypted document into MongoDB.
-
-Complete the remainder of the guide as is done with KMS providers other than KMIP.
