@@ -99,7 +99,7 @@ public class InsertDataWithEncryptedFields {
 
         /*
          * KMIP KMS
-         * Uncomment this block to use your AWS KMS provider key
+         * Uncomment this block to use your KMIP KMS provider key
         String kmsProvider = "kmip";
         providerDetails.put("endpoint", "localhost:5698");
         kmsProviders.put(kmsProvider, providerDetails);
