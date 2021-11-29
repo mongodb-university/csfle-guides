@@ -7,6 +7,7 @@ cp ${JAVA_HOME}/lib/security/cacerts mongo-truststore
 ${JAVA_HOME}/bin/keytool -importcert -trustcacerts -file drivers-evergreen-tools/.evergreen/x509gen/ca.pem -keystore mongo-truststore -storepass ${KEYSTORE_PASSWORD} -storetype JKS -noprompt
 
 # specify password in maven config file
+mkdir .mvn
 cp maven.config.tmpl .mvn/maven.config
 sed -i '' -e "s/REPLACE-WITH-KEYSTORE-PASSWORD/$KEYSTORE_PASSWORD/g" .mvn/maven.config
 sed -i '' -e "s/REPLACE-WITH-TRUSTSTORE-PASSWORD/$TRUSTSTORE_PASSWORD/g" .mvn/maven.config
