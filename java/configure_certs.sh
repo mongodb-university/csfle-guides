@@ -9,6 +9,7 @@ ${JAVA_HOME}/bin/keytool -importcert -trustcacerts -file drivers-evergreen-tools
 # specify password in maven config file
 cp maven.config.tmpl .mvn/maven.config
 sed -i '' -e "s/REPLACE-WITH-KEYSTORE-PASSWORD/$KEYSTORE_PASSWORD/g" .mvn/maven.config
+sed -i '' -e "s/REPLACE-WITH-TRUSTSTORE-PASSWORD/$TRUSTSTORE_PASSWORD/g" .mvn/maven.config
 
 # start the kmip server
 echo "Starting the KMIP Server..."
