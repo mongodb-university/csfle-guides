@@ -62,11 +62,11 @@
 
 KMIP requires the `direnv` tool for setting environment variables. 
 
-Run `direnv allow` to add the `KEYSTORE_PASSWORD` environment variable.
+Update the `TRUSTSTORE_PASSWORD` environment variable in your `.envrc` file to your global Java TrustStore password.
 
-If you have a keystore already set up, replace this environment variable with the password of your keystore.
+Run `direnv allow` to add the `TRUSTSTORE_PASSWORD` and `KEYSTORE_PASSWORD` environment variables.
 
-Run `source ./configure_certs.sh` to download the drivers tools repo, install certificates, and start the KMIP
+Run `source ./configure_certs.sh` to download the drivers tools repo, install certificates, and start your KMIP
 server.
 
 Once the server is running, run `mvn compile exec:java -Dexec.mainClass="com.mongodb.csfle.DataEncryptionKeyCreator"`
