@@ -66,7 +66,7 @@ Update the `TRUSTSTORE_PASSWORD` environment variable in your `.envrc` file to y
 
 Run `direnv allow` to add the `TRUSTSTORE_PASSWORD` and `KEYSTORE_PASSWORD` environment variables.
 
-Run `source ./configure_certs.sh` to clone a tooling repository, install certificates, and start your unstable KMIP
+Run `source ./configure_certs.sh` to configure certificates start your unstable KMIP
 test server.
 
 ⚠️ | Do not use the provided KMIP server in a production environment.
