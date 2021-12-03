@@ -1,9 +1,10 @@
 KMIP_PATH="../.kmip"
 
 # configure certificates for java
-openssl pkcs12 -CAfile "$KMIP_PATH"/certs/ca.pem -export -in "$KMIP_PATH"/certs/client.pem -out client.pkc -password pass:${KEYSTORE_PASSWORD}
-cp ${JAVA_HOME}/lib/security/cacerts mongo-truststore
-${JAVA_HOME}/bin/keytool -importcert -trustcacerts -file "$KMIP_PATH"/certs/ca.pem -keystore mongo-truststore -storepass ${KEYSTORE_PASSWORD} -storetype JKS -noprompt
+mkdir .generated_certs
+openssl pkcs12 -CAfile "$KMIP_PATH"/certs/ca.pem -export -in "$KMIP_PATH"/certs/client.pem -out .generated_certs/client.pkc -password pass:${KEYSTORE_PASSWORD}
+cp ${JAVA_HOME}/lib/security/cacerts .generated_certs/mongo-truststore
+${JAVA_HOME}/bin/keytool -importcert -trustcacerts -file "$KMIP_PATH"/certs/ca.pem -keystore .generated_certs/mongo-truststore -storepass ${KEYSTORE_PASSWORD} -storetype JKS -noprompt
 
 # specify password in maven config file
 mkdir .mvn
