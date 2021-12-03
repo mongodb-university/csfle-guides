@@ -14,11 +14,11 @@ PORT = 5698
 
 def main():
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    drivers_evergreen_tools = os.path.join(dir_path, "..", "..")
+    drivers_evergreen_tools = os.path.join(dir_path, "..")
     default_ca_file = os.path.join(
-        drivers_evergreen_tools, ".evergreen", "x509gen", "ca.pem")
+        drivers_evergreen_tools, "certs", "ca.pem")
     default_cert_file = os.path.join(
-        drivers_evergreen_tools, ".evergreen", "x509gen", "server.pem")
+        drivers_evergreen_tools, "certs", "server.pem")
 
     parser = argparse.ArgumentParser(
         description='MongoDB Mock KMIP KMS Endpoint.')
