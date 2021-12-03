@@ -1,6 +1,5 @@
 drivers-evergreen-tools/*/*
-mongo-truststore
-client.pkc
+.generated_certs/*
 .mvn/maven.config
 
 ### JetBrains ###
