@@ -1,10 +1,9 @@
-# clone the test kmip server
-git clone https://github.com/mongodb-labs/drivers-evergreen-tools.git
+KMIP_PATH="../.kmip"
 
-# key configuration from evergreen
-openssl pkcs12 -CAfile drivers-evergreen-tools/.evergreen/x509gen/ca.pem -export -in drivers-evergreen-tools/.evergreen/x509gen/client.pem -out client.pkc -password pass:${KEYSTORE_PASSWORD}
+# configure certificates for java
+openssl pkcs12 -CAfile "$KMIP_PATH"/certs/ca.pem -export -in "$KMIP_PATH"/certs/client.pem -out client.pkc -password pass:${KEYSTORE_PASSWORD}
 cp ${JAVA_HOME}/lib/security/cacerts mongo-truststore
-${JAVA_HOME}/bin/keytool -importcert -trustcacerts -file drivers-evergreen-tools/.evergreen/x509gen/ca.pem -keystore mongo-truststore -storepass ${KEYSTORE_PASSWORD} -storetype JKS -noprompt
+${JAVA_HOME}/bin/keytool -importcert -trustcacerts -file "$KMIP_PATH"/certs/ca.pem -keystore mongo-truststore -storepass ${KEYSTORE_PASSWORD} -storetype JKS -noprompt
 
 # specify password in maven config file
 mkdir .mvn
@@ -14,6 +13,6 @@ sed -i '' -e "s/REPLACE-WITH-TRUSTSTORE-PASSWORD/$TRUSTSTORE_PASSWORD/g" .mvn/ma
 
 # start the kmip server
 echo "Starting the KMIP Server..."
-cd drivers-evergreen-tools/.evergreen/csfle
+cd "$KMIP_PATH"/kmip_server/
 . ./activate_venv.sh
 ./kmstlsvenv/bin/python3 -u kms_kmip_server.py
