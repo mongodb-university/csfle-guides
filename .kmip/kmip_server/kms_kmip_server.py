@@ -10,15 +10,16 @@ import argparse
 
 HOSTNAME = "localhost"
 PORT = 5698
+KMIP_SERVER = "kmip_server"
 
 
 def main():
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    drivers_evergreen_tools = os.path.join(dir_path, "..")
+    kmip_dir = os.path.join(dir_path, "..")
     default_ca_file = os.path.join(
-        drivers_evergreen_tools, "certs", "ca.pem")
+        kmip_dir, "certs", "ca.pem")
     default_cert_file = os.path.join(
-        drivers_evergreen_tools, "certs", "server.pem")
+        kmip_dir, "certs", "server.pem")
 
     parser = argparse.ArgumentParser(
         description='MongoDB Mock KMIP KMS Endpoint.')
@@ -37,10 +38,10 @@ def main():
         ca_path=args.ca_file,
         config_path=None,
         auth_suite="TLS1.2",
-        log_path=os.path.join(drivers_evergreen_tools,
-                              ".evergreen", "csfle", "pykmip.log"),
+        log_path=os.path.join(kmip_dir,
+                              KMIP_SERVER, ".logs", "pykmip.log"),
         database_path=os.path.join(
-            drivers_evergreen_tools, ".evergreen", "csfle", "pykmip.db"),
+            kmip_dir, KMIP_SERVER, "pykmip.db"),
         logging_level=logging.DEBUG,
     )
     with server:
