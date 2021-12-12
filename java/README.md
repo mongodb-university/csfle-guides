@@ -64,26 +64,25 @@
 
 **KMIP support in this guide relies on unstable dependencies**.
 
-This guide uses the [`direnv`](https://direnv.net/) tool to manage environment variables.
+_This guide uses the [`direnv`](https://direnv.net/) tool to manage environment variables._
 
-Update the `TRUSTSTORE_PASSWORD` environment variable in your `.envrc` file to your global Java TrustStore password.
+1. Update the `TRUSTSTORE_PASSWORD` environment variable in your `.envrc` file to your global Java TrustStore password.
 
-Run `direnv allow` to add the `TRUSTSTORE_PASSWORD` and `KEYSTORE_PASSWORD` environment variables.
+2. Run `direnv allow` to add the `TRUSTSTORE_PASSWORD` and `KEYSTORE_PASSWORD` environment variables to your run-time environment.
 
-Run `source ./configure_certs.sh` to configure certificates start your unstable KMIP
-test server.
+3. Run `source ./configure_certs.sh` to configure certificates and
+   start your unstable KMIP test server.
 
 | ⚠️  | Do not use the provided KMIP server in a production environment. |
 | :-: | :--------------------------------------------------------------- |
 
-Once the server is running, execute the following command:
+4. Execute the following command from the `csfle-examples/java` directory to create a data encryption key:
 
-    mvn compile exec:java -Dexec.mainClass="com.mongodb.csfle.DataEncryptionKeyCreator"
+   mvn compile exec:java -Dexec.mainClass="com.mongodb.csfle.DataEncryptionKeyCreator"
 
-from the `csfle-examples/java` directory to create a data encryption key.
+5. Enter your key as the value of the
+   `keyId` attribute in your `InsertDataWithEncryptedFields` class.
 
-Once you have created your key, add your key to your `InsertDataWithEncryptedFields` class and run the following command:
+6. Run the following command from the `csfle-examples/java` directory to insert an encrypted document into MongoDB:
 
-    mvn compile exec:java -Dexec.mainClass="com.mongodb.csfle.InsertDataWithEncryptedFields"
-
-from the `csfle-examples/java` directory to insert an encrypted document into MongoDB.
+   mvn compile exec:java -Dexec.mainClass="com.mongodb.csfle.InsertDataWithEncryptedFields"
