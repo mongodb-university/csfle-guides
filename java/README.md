@@ -58,7 +58,7 @@
 
 ## KMIP
 
-**KMIP support in this guide is to be considered "best effort"**.
+**KMIP support in this guide relies on unstable dependencies**.
 
 This guide uses the [`direnv`](https://direnv.net/) tool to manage environment variables. 
 
@@ -66,12 +66,20 @@ Update the `TRUSTSTORE_PASSWORD` environment variable in your `.envrc` file to y
 
 Run `direnv allow` to add the `TRUSTSTORE_PASSWORD` and `KEYSTORE_PASSWORD` environment variables.
 
-Run `source ./configure_certs.sh` to clone a tooling repository, install certificates, and start your KMIP
-server.
+Run `source ./configure_certs.sh` to configure certificates start your unstable KMIP
+test server.
 
-Once the server is running, run `mvn compile exec:java -Dexec.mainClass="com.mongodb.csfle.DataEncryptionKeyCreator"`
+⚠️ | Do not use the provided KMIP server in a production environment.
+:---: | :---
+
+Once the server is running, execute the following command:
+
+    mvn compile exec:java -Dexec.mainClass="com.mongodb.csfle.DataEncryptionKeyCreator"
+
 from the `csfle-examples/java` directory to create a data encryption key.
 
-Once you have created your key, add your key to your `InsertDataWithEncryptedFields` class and run 
-`mvn compile exec:java -Dexec.mainClass="com.mongodb.csfle.InsertDataWithEncryptedFields"`
+Once you have created your key, add your key to your `InsertDataWithEncryptedFields` class and run the following command:
+
+    mvn compile exec:java -Dexec.mainClass="com.mongodb.csfle.InsertDataWithEncryptedFields"
+
 from the `csfle-examples/java` directory to insert an encrypted document into MongoDB.
