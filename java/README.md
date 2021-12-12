@@ -78,11 +78,15 @@ _This guide uses the [`direnv`](https://direnv.net/) tool to manage environment 
 
 4. Execute the following command from the `csfle-examples/java` directory to create a data encryption key:
 
+   ```
    mvn compile exec:java -Dexec.mainClass="com.mongodb.csfle.DataEncryptionKeyCreator"
+   ```
 
 5. Enter your key as the value of the
    `keyId` attribute in your `InsertDataWithEncryptedFields` class.
 
 6. Run the following command from the `csfle-examples/java` directory to insert an encrypted document into MongoDB:
 
+   ```
    mvn compile exec:java -Dexec.mainClass="com.mongodb.csfle.InsertDataWithEncryptedFields"
+   ```
