@@ -1,6 +1,6 @@
 # KMIP Test Resources
 
-This directory contains resources used to test a KMIP compliant CMS for use in CSFLE.
+This directory contains resources used to test a KMIP compliant KMS for use in CSFLE.
 
 ## KMIP Server
 
