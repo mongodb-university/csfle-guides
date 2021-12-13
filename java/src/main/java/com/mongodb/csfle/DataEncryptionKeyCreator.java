@@ -101,6 +101,18 @@ public class DataEncryptionKeyCreator {
          kmsProviders.put(kmsProvider,  providerDetails);
         */
 
+        /*
+         * KMIP KMS
+         * Uncomment this block to use your KMIP KMS provider key
+         String kmsProvider = "kmip";
+         masterKeyProperties.put("provider", "kmip");
+         masterKeyProperties.put("keyId", "1");
+
+         Map<String, Object> providerDetails = new HashMap<>();
+         providerDetails.put("endpoint", "localhost:5698");
+         kmsProviderProperties.put(kmsProvider,  providerDetails);
+         */
+
         // Ensure index exists on key vault
         CSFLEHelpers.createKeyVaultIndex(connectionString, keyDb, keyColl);
 
