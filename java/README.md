@@ -83,7 +83,8 @@ _This guide uses the [`direnv`](https://direnv.net/) tool to manage environment 
    ```
 
 5. Enter your key as the value of the
-   `keyId` attribute in your `InsertDataWithEncryptedFields` class.
+   `keyId` local variable in the main method
+   of the `InsertDataWithEncryptedFields` class.
 
 6. Run the following command from the `csfle-examples/java` directory to insert an encrypted document into MongoDB:
 
