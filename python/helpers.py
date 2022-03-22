@@ -81,7 +81,7 @@ class CsfleHelper:
 
     def find_or_create_data_key(self):
         """
-        In the guide, https://docs.mongodb.com/drivers/security/client-side-field-level-encryption-guide/,
+        In the guide, https://www.mongodb.com/docs/drivers/security/client-side-field-level-encryption-guide/,
         we create the data key and then show that it is created by
         using a find_one query. Here, in implementation, we only create the key if
         it doesn't already exist, ensuring we only have one local data key.

@@ -35,7 +35,7 @@ def main():
     }
 
     """
-    For AWS KMS, uncomment this block. See https://docs.mongodb.com/drivers/security/client-side-field-level-encryption-local-key-to-kms
+    For AWS KMS, uncomment this block. See https://www.mongodb.com/docs/drivers/security/client-side-field-level-encryption-local-key-to-kms
     for more information on storing a master key on a KMS.
 
     kms_provider_name = "aws"
@@ -56,7 +56,7 @@ def main():
     """
 
     """
-    For Azure KMS, uncomment this block. See https://docs.mongodb.com/drivers/security/client-side-field-level-encryption-local-key-to-kms
+    For Azure KMS, uncomment this block. See https://www.mongodb.com/docs/drivers/security/client-side-field-level-encryption-local-key-to-kms
     for more information on storing a master key on a KMS.
 
     kms_provider_name = "azure"
@@ -77,7 +77,7 @@ def main():
     """
 
     """
-    For GCP KMS, uncomment this block. See https://docs.mongodb.com/drivers/security/client-side-field-level-encryption-local-key-to-kms
+    For GCP KMS, uncomment this block. See https://www.mongodb.com/docs/drivers/security/client-side-field-level-encryption-local-key-to-kms
     for more information on storing a master key on a KMS.
 
     kms_provider_name = "gcp"

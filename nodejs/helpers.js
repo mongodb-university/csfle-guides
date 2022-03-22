@@ -65,7 +65,7 @@ module.exports = {
     }
 
     /**
-     * In the guide, https://docs.mongodb.com/ecosystem/use-cases/client-side-field-level-encryption-guide/,
+     * In the guide, https://www.mongodb.com/docs/drivers/security/client-side-field-level-encryption-guide/,
      * we create the data key and then show that it is created by
      * retreiving it using a findOne query. Here, in implementation, we only
      * create the key if it doesn't already exist, ensuring we only have one
