@@ -22,7 +22,7 @@
 4. Make sure you have the `master-key.txt` file in the root of your execution
    environment. This is a 96-byte cryptographically-secure generated master
    encryption key required to run this example project. To generate your own
-   master key or use a KMS, refer to the [CSFLE Use Case Guide](https://docs.mongodb.com/ecosystem/use-cases/client-side-field-level-encryption-guide/).
+   master key or use a KMS, refer to the [CSFLE Use Case Guide](https://www.mongodb.com/drivers/security/client-side-field-level-encryption-guide/).
 
 5. Edit the line
 

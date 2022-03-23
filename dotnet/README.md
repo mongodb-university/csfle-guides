@@ -20,8 +20,8 @@ Currently, remote KMS support is Windows only.
 3. Make sure you have the `master-key.txt` file in the root of your
    execution environment if you are using a local KMS. This is a 96-byte cryptographically-secure generated
    master encryption key required to run this example project. To generate your
-   own master key or use a KMS, refer to the [CSFLE Use Case
-   Guide](https://docs.mongodb.com/drivers/security/client-side-field-level-encryption-guide/).
+   own master key or use a KMS, refer to the 
+   [CSFLE Use Case Guide](https://www.mongodb.com/docs/drivers/security/client-side-field-level-encryption-guide/).
 
 4. Configure variables for your preferred remote KMS, if
    necessary. Out of the box, this application looks for KMS credentials and data key options

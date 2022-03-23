@@ -18,7 +18,7 @@
    execution environment. This is a 96-byte cryptographically-secure generated
    master encryption key required to run this example project. To generate your
    own master key or use a KMS, refer to the [CSFLE Use Case
-   Guide](https://docs.mongodb.com/drivers/security/client-side-field-level-encryption-guide/).
+   Guide](https://www.mongodb.com/docs/drivers/security/client-side-field-level-encryption-guide/).
 
    The settings for each supported KMS are located in
    `kms/provider.go`. In this project we have used [godotenv](https://github.com/joho/godotenv) to

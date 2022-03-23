@@ -1,7 +1,7 @@
 {
   "name": "csfle",
   "version": "1.0.0",
-  "description": "A sample implementation of field level encryption in MongoDB, meant to accompany the CSFLE guide at https://docs.mongodb.com/ecosystem/use-cases/client-side-field-level-encryption-guide/",
+  "description": "A sample implementation of field level encryption in MongoDB, meant to accompany the CSFLE guide at https://www.mongodb.com/docs/drivers/security/client-side-field-level-encryption-guide/",
   "main": "clients.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
