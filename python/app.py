@@ -107,6 +107,7 @@ def main():
     example_document = {
         "name": "Jon Doe",
         "ssn": 241014209,
+        "key": "demo-data-key",
         "bloodType": "AB+",
         "medicalRecords": [
             {
@@ -140,26 +141,12 @@ def main():
     # performing the insert operation with the CSFLE-enabled client
     # we're using an update with upsert so that subsequent runs of this script don't
     # add more documents
-    encrypted_client.records.patients.update_one(
-        {"ssn": example_document["ssn"]},
-        {"$set": example_document}, upsert=True)
+    encrypted_client.records.patients.insert_one(
+        example_document)
 
-    # perform a read using the csfle enabled client. We expect all fields to
-    # be readable.
-    # querying on an encrypted field using strict equality
-    csfle_find_result = encrypted_client.records.patients.find_one(
-        {"ssn": example_document["ssn"]})
-    print(
-        f"Document retrieved with csfle enabled client:\n{csfle_find_result}\n")
+
     encrypted_client.close()
 
-    # perform a read using the regular client. We expect some fields to be
-    # encrypted.
-    regular_client = csfle_helper.get_regular_client()
-    regular_find_result = regular_client.records.patients.find_one({
-                                                                   "name": "Jon Doe"})
-    print(f"Document found regular_find_result:\n{regular_find_result}")
-    regular_client.close()
 
 
 if __name__ == "__main__":
