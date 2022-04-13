@@ -152,7 +152,13 @@ def main():
         f"Document retrieved with csfle enabled client:\n{csfle_find_result}\n")
     encrypted_client.close()
 
-
+    # perform a read using the regular client. We expect some fields to be
+    # encrypted.
+    regular_client = csfle_helper.get_regular_client()
+    regular_find_result = regular_client.records.patients.find_one({
+                                                                   "name": "Jon Doe"})
+    print(f"Document found regular_find_result:\n{regular_find_result}")
+    regular_client.close()
 
 if __name__ == "__main__":
     main()
