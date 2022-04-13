@@ -143,8 +143,13 @@ def main():
     # add more documents
     encrypted_client.records.patients.insert_one(
         example_document)
-
-
+    # perform a read using the csfle enabled client. We expect all fields to
+    # be readable.
+    # querying on an encrypted field using strict equality
+    csfle_find_result = encrypted_client.records.patients.find_one(
+        {"ssn": example_document["ssn"]})
+    print(
+        f"Document retrieved with csfle enabled client:\n{csfle_find_result}\n")
     encrypted_client.close()
 
 
