@@ -5,9 +5,8 @@ const kmsClient = kms.localCsfleHelper();
 
 async function main(regularClient, csfleClient) {
   try {
-    let dataKey = "RQo8Da4DTRSGrf8FN30kGw=="; // change this to the base64 encoded data key generated from make-data-key.js
+    let dataKey = null; // change this to the base64 encoded data key generated from make-data-key.js
     if (dataKey === null) {
-      Error.stackTraceLimit = 1ed
       let err = new Error(
         `dataKey is required.
 Run make-data-key.js and ensure you copy and paste the output into client.js
