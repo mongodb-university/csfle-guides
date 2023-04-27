@@ -1,17 +1,7 @@
-# MongoDB CSFLE Companion Projects
+# The MongoDB CSFLE Guides Repository is Archived
 
-This repository contains companion projects to go along with our [CSFLE Use Case Guide](https://www.mongodb.com/docs/drivers/security/client-side-field-level-encryption-guide/).
-These companion projects are structured so that they bundle all requirements
-except for `mongocryptd`, which is available for download from the
-[MongoDB Download Site](https://www.mongodb.com/download-center/enterprise).
+> **Warning**
+>
+> **This repository has been archived and the code is no longer maintained.**
 
-For the Java implementation, see the `java` directory.
-
-For the Python implementation, see the `python` directory.
-
-For the Node.js implementation, see the `nodejs` directory.
-
-For the C# implementation, see the `dotnet` directory.
-
-For the Go implementation, see the `go` directory.
-
+For MongoDB Field Level Encryption examples maintained by MongoDB, see [mongodb-university/docs-in-use-encryption-examples](https://github.com/mongodb-university/docs-in-use-encryption-examples/).
